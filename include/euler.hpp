@@ -17,6 +17,7 @@ class Euler {
   void flux();
   double rhs_times_dt();
   void update_q();
+  void dadi();
 
   Inputs *inputs;
   BC *bc;

@@ -25,7 +25,7 @@ void Euler::step(){
 
   residual = this->rhs_times_dt();
 
-  if(step_number % 10 == 0){
+  if(step_number % 1 == 0){
 
     if(residual != residual){
       throw 234;
@@ -33,6 +33,8 @@ void Euler::step(){
 
     printf("%d : %12.8e\n", step_number, residual);
   }
+
+  this->dadi();
 
   this->update_q();
   

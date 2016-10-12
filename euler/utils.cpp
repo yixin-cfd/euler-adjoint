@@ -39,7 +39,7 @@ double Euler::rhs_times_dt(){
 void Euler::update_q(){
 
   int idx, j, k;
-
+  int errc = 0;
   for(k=dim->nghost; k<dim->kmax+dim->nghost; k++){
   for(j=dim->nghost; j<dim->jmax+dim->nghost; j++){
 
@@ -49,6 +49,11 @@ void Euler::update_q(){
     q[idx][1] += rhs[idx][1];
     q[idx][2] += rhs[idx][2];
     q[idx][3] += rhs[idx][3];
+
+    if(errc < 5 && q[idx][0] != q[idx][0]){
+      printf("found a nan at %d %d\n", j, k);
+      errc++;
+    }
 
   }
   }
