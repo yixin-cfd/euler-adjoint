@@ -13,13 +13,13 @@ void periodic_bc(BC bc, double (*q)[4], Dim *dim){
 
       // find the periodic idx
       if(face == JMIN_FACE){
-      	pidx = (dim->jtot - 2*pad)*dim->jstride + k*dim->kstride;
+      	pidx = (dim->jtot - 2*pad +j)*dim->jstride + k*dim->kstride;
       }
       if(face == JMAX_FACE){
       	pidx = (j - dim->jtot + 2*pad)*dim->jstride + k*dim->kstride;
       }
       if(face == KMIN_FACE){
-      	pidx = j*dim->jstride + (dim->ktot - 2*pad)*dim->kstride;
+      	pidx = j*dim->jstride + (dim->ktot - 2*pad + k)*dim->kstride;
       }
       if(face == KMAX_FACE){
       	pidx = j*dim->jstride + (k - dim->ktot + 2*pad)*dim->kstride;

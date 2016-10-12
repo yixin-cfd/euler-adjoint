@@ -27,9 +27,6 @@ endif()
 find_package(Boost COMPONENTS python REQUIRED)
 find_package(PythonLibs REQUIRED)
 message(STATUS "python libs: ${PYTHON_LIBRARIES}")
-execute_process(COMMAND python -c "import mpi4py; print( mpi4py.get_include() )"
-  OUTPUT_VARIABLE mpi4py_inc OUTPUT_STRIP_TRAILING_WHITESPACE)
-message(STATUS "mpi4py: ${mpi4py_inc}")
 message(STATUS "boosts: ${Boost_LIBRARIES}")
 
 #

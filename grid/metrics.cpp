@@ -61,6 +61,8 @@ void Grid::metrics(){
   double diag1_x, diag1_y, diag2_x, diag2_y;
   for(k=dim->nghost; k<ktot-dim->nghost; k++){
     for(j=dim->nghost; j<jtot-dim->nghost; j++){
+  // for(k=0; k<ktot-1; k++){
+  //   for(j=0; j<jtot-1; j++){
       
       idx1 = j*jstride + k*kstride;
       idx2 = idx1 + jstride;

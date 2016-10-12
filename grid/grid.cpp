@@ -57,7 +57,7 @@ Grid::Grid(boost::python::object o, int ng){
     }
   }
 
-  // extrapolate j-ghost coords
+  // handle j-ghost coords
   for(k=dim->nghost; k<=dim->ktot-dim->nghost; k++){
     for(j=dim->nghost-1; j>=0; j--){
       idx1 = dim->nghost*jstride + k*kstride;
@@ -78,7 +78,7 @@ Grid::Grid(boost::python::object o, int ng){
   }
 
 
-  // extrapolate k-ghost coords
+  // handle k-ghost coords
   for(j=0; j<dim->jtot; j++){
     for(k=dim->nghost-1; k>=0; k--){
       idx1 = j*jstride + dim->nghost*kstride;
