@@ -1,0 +1,6 @@
+*/*~
+yaml/build
+build/*
+python/*.pyc
+TAGS
+test/*
