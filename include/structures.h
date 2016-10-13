@@ -14,7 +14,7 @@ struct Inputs {
   double cfl;
   double aoa;
   double u_inf, v_inf, p_inf, e_inf, rho_inf;
-  int nbc;
+  int nbc, resid, ilhs;
 };
 
 struct BC {

@@ -16,6 +16,8 @@ void Euler::read_inputs(std::string yaml_string){
   inputs->aoa   = yaml["aoa"].as<double>();
   inputs->steps = yaml["steps"].as<int>();
   inputs->cfl   = yaml["cfl"].as<double>();
+  inputs->ilhs  = yaml["ilhs"].as<int>();
+  inputs->resid = yaml["resid"].as<int>();
   inputs->nbc   = nbc;
 
   printf("ok with inputs\n");

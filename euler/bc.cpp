@@ -129,8 +129,32 @@ void farfield_bc(BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
 
 }
 
+// slow start
+void ramp_bc(double ratio, BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
+
+  int j, k, idx, pidx;
+  int pad = dim->nghost;
+
+  for(k=bc.ks; k<=bc.ke; k++){
+  for(j=bc.js; j<=bc.je; j++){
+      
+      idx = j*dim->jstride + k*dim->kstride;
+
+      q[idx][0] = q[idx][0]*(ratio) + (1.0-ratio)*inputs->rho_inf;
+      q[idx][1] = q[idx][1]*(ratio) + (1.0-ratio)*inputs->rho_inf * inputs->u_inf;
+      q[idx][2] = q[idx][2]*(ratio) + (1.0-ratio)*inputs->rho_inf * inputs->v_inf;
+      q[idx][3] = q[idx][3]*(ratio) + (1.0-ratio)*inputs->e_inf;
+
+  }
+  }
+
+}
+
 
 void Euler::boundary_conditions(){
+
+  int ramp = (step_number < 30);
+  double ratio = 1.0;
 
   for(int i=0; i<inputs->nbc; i++){
 
@@ -157,5 +181,13 @@ void Euler::boundary_conditions(){
       break;
 
     }
+
+    // slow start
+    if(ramp && bc[i].type == WALL_BC){
+      ratio = step_number * 1.0 / 30.0;
+      ratio = (10.0 - 15.0*ratio + 6.0*ratio*ratio)*ratio*ratio*ratio;
+      ramp_bc(ratio, bc[i], q, dim, inputs);
+    }
+    
   }
 }

@@ -31,6 +31,9 @@ Euler::Euler(Grid *g, std::string yaml_string){
 
   read_inputs(yaml_string);
   init();
+
+  FILE *f = fopen("residual.dat", "w");
+  fclose(f);
   
 }
 

@@ -161,7 +161,7 @@ void invert_xi(double (*rhs)[4], double (*q)[4], Dim *dim, Grid *grid){
     r0 = T_inv[ 0]*rhs[i][0] + T_inv[ 1]*rhs[i][1] + T_inv[ 2]*rhs[i][2] + T_inv[ 3]*rhs[i][3];
     r1 = T_inv[ 4]*rhs[i][0] + T_inv[ 5]*rhs[i][1] + T_inv[ 6]*rhs[i][2] + T_inv[ 7]*rhs[i][3];
     r2 = T_inv[ 8]*rhs[i][0] + T_inv[ 9]*rhs[i][1] + T_inv[10]*rhs[i][2] + T_inv[11]*rhs[i][3];
-    r3 = T_inv[12]*rhs[i][0] + T_inv[13]*rhs[i][1] + T_inv[13]*rhs[i][2] + T_inv[15]*rhs[i][3];
+    r3 = T_inv[12]*rhs[i][0] + T_inv[13]*rhs[i][1] + T_inv[14]*rhs[i][2] + T_inv[15]*rhs[i][3];
 
     rhs[i][0] = r0;
     rhs[i][1] = r1;
@@ -195,7 +195,7 @@ void invert_eta(double (*rhs)[4], double (*q)[4], Dim *dim, Grid *grid){
     r0 = T[ 0]*rhs[i][0] + T[ 1]*rhs[i][1] + T[ 2]*rhs[i][2] + T[ 3]*rhs[i][3];
     r1 = T[ 4]*rhs[i][0] + T[ 5]*rhs[i][1] + T[ 6]*rhs[i][2] + T[ 7]*rhs[i][3];
     r2 = T[ 8]*rhs[i][0] + T[ 9]*rhs[i][1] + T[10]*rhs[i][2] + T[11]*rhs[i][3];
-    r3 = T[12]*rhs[i][0] + T[13]*rhs[i][1] + T[13]*rhs[i][2] + T[15]*rhs[i][3];
+    r3 = T[12]*rhs[i][0] + T[13]*rhs[i][1] + T[14]*rhs[i][2] + T[15]*rhs[i][3];
 
     rhs[i][0] = r0;
     rhs[i][1] = r1;
@@ -237,7 +237,7 @@ void invert_xi_eta(double (*rhs)[4], double (*q)[4], Dim *dim, Grid *grid){
     r0 = N[ 0]*rhs[i][0] + N[ 1]*rhs[i][1] + N[ 2]*rhs[i][2] + N[ 3]*rhs[i][3];
     r1 = N[ 4]*rhs[i][0] + N[ 5]*rhs[i][1] + N[ 6]*rhs[i][2] + N[ 7]*rhs[i][3];
     r2 = N[ 8]*rhs[i][0] + N[ 9]*rhs[i][1] + N[10]*rhs[i][2] + N[11]*rhs[i][3];
-    r3 = N[12]*rhs[i][0] + N[13]*rhs[i][1] + N[13]*rhs[i][2] + N[15]*rhs[i][3];
+    r3 = N[12]*rhs[i][0] + N[13]*rhs[i][1] + N[14]*rhs[i][2] + N[15]*rhs[i][3];
 
     rhs[i][0] = r0;
     rhs[i][1] = r1;
@@ -248,8 +248,6 @@ void invert_xi_eta(double (*rhs)[4], double (*q)[4], Dim *dim, Grid *grid){
   
 }
 
-#define EPS 0.08
-
 void xi_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
 		    double (*L)[4], double (*D)[4], double (*U)[4],
 		    Dim *dim, Grid *grid){
@@ -257,6 +255,7 @@ void xi_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
   double kx, ky, jac, mag;
   double rho, irho, u, v, w, p, cn;
   double lambda_plus, lambda_minus, abs_lambda, lam0, lam2, lam3;
+  double eps;
   int i, j, k;
 
   for(k=dim->nghost; k<dim->kmax + dim->nghost; k++){
@@ -268,8 +267,10 @@ void xi_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
 
     jac = 1.0 / grid->V[i];
 
-    kx  = grid->Sj[i][0]*jac;
-    ky  = grid->Sj[i][1]*jac;
+    // kx  = grid->Sj[i][0]*jac;
+    // ky  = grid->Sj[i][1]*jac;
+    kx  = 0.5*(grid->Sj[i][0] + grid->Sj[i+dim->jstride][0])*jac;
+    ky  = 0.5*(grid->Sj[i][1] + grid->Sj[i+dim->jstride][1])*jac;
 
     mag = sqrt(kx*kx + ky*ky);
 
@@ -277,44 +278,46 @@ void xi_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
     irho   = 1.0 / rho;
     u      = q[i][1]*irho;
     v      = q[i][2]*irho;
-    p      = (GAMMA-1.0)*(q[i][3] - rho*(u*u + v*v));
+    p      = (GAMMA-1.0)*(q[i][3] - 0.5*rho*(u*u + v*v));
     cn     = sqrt(GAMMA*p*irho)*mag;
     
     lam0 = kx*u + ky*v;
     lam2 = lam0 + cn;
     lam3 = lam0 - cn;
 
+    eps = 0.08*mag;
+
     // lambda 0
-    abs_lambda   = (1.05)*sqrt(lam0*lam0 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam0*lam0 + eps*eps);
     lambda_plus  = 0.5*(lam0 + abs_lambda);
     lambda_minus = 0.5*(lam0 - abs_lambda);
 
-    L[i][0] =       (lambda_plus               )*dt[i];
-    D[i][0] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][0] =       (lambda_minus              )*dt[i];
+    L[i][0] =       (-lambda_plus               )*dt[i];
+    D[i][0] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][0] =       ( lambda_minus              )*dt[i];
 
     // lambda 1 = lambda 0
-    L[i][1] =       (lambda_plus               )*dt[i];
-    D[i][1] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][1] =       (lambda_minus              )*dt[i];
+    L[i][1] =       (-lambda_plus               )*dt[i];
+    D[i][1] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][1] =       ( lambda_minus              )*dt[i];
 
     // lambda 2
-    abs_lambda   = (1.05)*sqrt(lam2*lam2 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam2*lam2 + eps*eps);
     lambda_plus  = 0.5*(lam2 + abs_lambda);
     lambda_minus = 0.5*(lam2 - abs_lambda);
 
-    L[i][2] =       (lambda_plus               )*dt[i];
-    D[i][2] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][2] =       (lambda_minus              )*dt[i];
+    L[i][2] =       (-lambda_plus               )*dt[i];
+    D[i][2] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][2] =       ( lambda_minus              )*dt[i];
 
     // lambda 3
-    abs_lambda   = (1.05)*sqrt(lam3*lam3 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam3*lam3 + eps*eps);
     lambda_plus  = 0.5*(lam3 + abs_lambda);
     lambda_minus = 0.5*(lam3 - abs_lambda);
 
-    L[i][4] =       (lambda_plus               )*dt[i];
-    D[i][4] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][4] =       (lambda_minus              )*dt[i];
+    L[i][3] =       (-lambda_plus               )*dt[i];
+    D[i][3] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][3] =       ( lambda_minus              )*dt[i];
 
   }
   }
@@ -344,17 +347,20 @@ void eta_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
   double kx, ky, jac, mag;
   double rho, irho, u, v, w, p, cn;
   double lambda_plus, lambda_minus, abs_lambda, lam0, lam2, lam3;
+  double eps;
   int i, j, k;
 
-  for(j=1; j<dim->jtot-1; j++){
-  for(k=1; k<dim->ktot-1; k++){
+  for(k=dim->nghost; k<dim->kmax + dim->nghost; k++){
+  for(j=dim->nghost; j<dim->jmax + dim->nghost; j++){
+  // for(j=1; j<dim->jtot-1; j++){
+  // for(k=1; k<dim->ktot-1; k++){
 
     i   = j*dim->jstride + k*dim->kstride;
 
     jac = 1.0 / grid->V[i];
 
-    kx  = grid->Sk[i][0]*jac;
-    ky  = grid->Sk[i][1]*jac;
+    kx  = 0.5*(grid->Sk[i][0] + grid->Sk[i+dim->kstride][0])*jac;
+    ky  = 0.5*(grid->Sk[i][1] + grid->Sk[i+dim->kstride][1])*jac;
 
     mag = sqrt(kx*kx + ky*ky);
 
@@ -362,44 +368,46 @@ void eta_tridiagonal(double (*rhs)[4], double (*q)[4], double *dt,
     irho   = 1.0 / rho;
     u      = q[i][1]*irho;
     v      = q[i][2]*irho;
-    p      = (GAMMA-1.0)*(q[i][3] - rho*(u*u + v*v));
+    p      = (GAMMA-1.0)*(q[i][3] - 0.5*rho*(u*u + v*v));
     cn     = sqrt(GAMMA*p*irho)*mag;
     
     lam0 = kx*u + ky*v;
     lam2 = lam0 + cn;
     lam3 = lam0 - cn;
 
+    eps = 0.08*mag;
+
     // lambda 0
-    abs_lambda   = (1.05)*sqrt(lam0*lam0 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam0*lam0 + eps*eps);
     lambda_plus  = 0.5*(lam0 + abs_lambda);
     lambda_minus = 0.5*(lam0 - abs_lambda);
 
-    L[i][0] =       (lambda_plus               )*dt[i];
-    D[i][0] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][0] =       (lambda_minus              )*dt[i];
+    L[i][0] =       (-lambda_plus               )*dt[i];
+    D[i][0] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][0] =       ( lambda_minus              )*dt[i];
 
     // lambda 1 = lambda 0
-    L[i][1] =       (lambda_plus               )*dt[i];
-    D[i][1] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][1] =       (lambda_minus              )*dt[i];
+    L[i][1] =       (-lambda_plus               )*dt[i];
+    D[i][1] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][1] =       ( lambda_minus              )*dt[i];
 
     // lambda 2
-    abs_lambda   = (1.05)*sqrt(lam2*lam2 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam2*lam2 + eps*eps);
     lambda_plus  = 0.5*(lam2 + abs_lambda);
     lambda_minus = 0.5*(lam2 - abs_lambda);
 
-    L[i][2] =       (lambda_plus               )*dt[i];
-    D[i][2] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][2] =       (lambda_minus              )*dt[i];
+    L[i][2] =       (-lambda_plus               )*dt[i];
+    D[i][2] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][2] =       ( lambda_minus              )*dt[i];
 
     // lambda 3
-    abs_lambda   = (1.05)*sqrt(lam3*lam3 + EPS*EPS);
+    abs_lambda   = (1.05)*sqrt(lam3*lam3 + eps*eps);
     lambda_plus  = 0.5*(lam3 + abs_lambda);
     lambda_minus = 0.5*(lam3 - abs_lambda);
 
-    L[i][4] =       (lambda_plus               )*dt[i];
-    D[i][4] = 1.0 + (lambda_plus - lambda_minus)*dt[i];
-    U[i][4] =       (lambda_minus              )*dt[i];
+    L[i][3] =       (-lambda_plus               )*dt[i];
+    D[i][3] = 1.0 + ( lambda_plus - lambda_minus)*dt[i];
+    U[i][3] =       ( lambda_minus              )*dt[i];
 
   }
   }
@@ -437,7 +445,7 @@ void Euler::dadi(){
   // multiply rhs by T_eta_inv * T_xi
   invert_xi_eta(rhs, q, dim, grid);
 
-  // Find L-D-U for Xi-direction, do tri-diagonal
+  // Find L-D-U for Eta-direction, do tri-diagonal
   eta_tridiagonal(rhs, q, dt, L, D, U, dim, grid);
   
   // multiply rhs by T_eta
