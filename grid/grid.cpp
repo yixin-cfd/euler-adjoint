@@ -62,18 +62,18 @@ Grid::Grid(boost::python::object o, int ng){
     for(j=dim->nghost-1; j>=0; j--){
       idx1 = dim->nghost*jstride + k*kstride;
       idx2 = j*jstride + k*kstride;
-      // xy[idx2][0] = 2*xy[idx2+jstride][0] - xy[idx2+2*jstride][0];
-      // xy[idx2][1] = 2*xy[idx2+jstride][1] - xy[idx2+2*jstride][1];
-      xy[idx2][0] = xy[idx1][0];
-      xy[idx2][1] = xy[idx1][1];
+      xy[idx2][0] = 2*xy[idx2+jstride][0] - xy[idx2+2*jstride][0];
+      xy[idx2][1] = 2*xy[idx2+jstride][1] - xy[idx2+2*jstride][1];
+      // xy[idx2][0] = xy[idx1][0];
+      // xy[idx2][1] = xy[idx1][1];
     }
     for(j=dim->jtot-dim->nghost+1; j<dim->jtot; j++){
       idx1 = (dim->jtot-dim->nghost)*jstride + k*kstride;
       idx2 = j*jstride + k*kstride;
-      // xy[idx2][0] = 2*xy[idx2-jstride][0] - xy[idx2-2*jstride][0];
-      // xy[idx2][1] = 2*xy[idx2-jstride][1] - xy[idx2-2*jstride][1];
-      xy[idx2][0] = xy[idx1][0];
-      xy[idx2][1] = xy[idx1][1];
+      xy[idx2][0] = 2*xy[idx2-jstride][0] - xy[idx2-2*jstride][0];
+      xy[idx2][1] = 2*xy[idx2-jstride][1] - xy[idx2-2*jstride][1];
+      // xy[idx2][0] = xy[idx1][0];
+      // xy[idx2][1] = xy[idx1][1];
     }    
   }
 
@@ -83,18 +83,18 @@ Grid::Grid(boost::python::object o, int ng){
     for(k=dim->nghost-1; k>=0; k--){
       idx1 = j*jstride + dim->nghost*kstride;
       idx2 = j*jstride + k*kstride;
-      // xy[idx2][0] = 2*xy[idx2+kstride][0] - xy[idx2+2*kstride][0];
-      // xy[idx2][1] = 2*xy[idx2+kstride][1] - xy[idx2+2*kstride][1];
-      xy[idx2][0] = xy[idx1][0];
-      xy[idx2][1] = xy[idx1][1];
+      xy[idx2][0] = 2*xy[idx2+kstride][0] - xy[idx2+2*kstride][0];
+      xy[idx2][1] = 2*xy[idx2+kstride][1] - xy[idx2+2*kstride][1];
+      // xy[idx2][0] = xy[idx1][0];
+      // xy[idx2][1] = xy[idx1][1];
     }
     for(k=dim->ktot-dim->nghost+1; k<dim->ktot; k++){
       idx1 = j*jstride + (dim->ktot-dim->nghost)*kstride;
       idx2 = j*jstride + k*kstride;
-      // xy[idx2][0] = 2*xy[idx2-kstride][0] - xy[idx2-2*kstride][0];
-      // xy[idx2][1] = 2*xy[idx2-kstride][1] - xy[idx2-2*kstride][1];
-      xy[idx2][0] = xy[idx1][0];
-      xy[idx2][1] = xy[idx1][1];
+      xy[idx2][0] = 2*xy[idx2-kstride][0] - xy[idx2-2*kstride][0];
+      xy[idx2][1] = 2*xy[idx2-kstride][1] - xy[idx2-2*kstride][1];
+      // xy[idx2][0] = xy[idx1][0];
+      // xy[idx2][1] = xy[idx1][1];
     }
   }
 

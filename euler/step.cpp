@@ -42,6 +42,11 @@ void Euler::step(){
   }
 
   this->update_q();
-  
 
+  // if((step_number+1)%inputs->resid == 0){
+
+  //   int idx = 190*dim->jstride + 3*dim->kstride;
+  //   printf("q %e %e %e %e\n", q[idx][0], q[idx][1], q[idx][2], q[idx][3]);
+
+  // }
 }

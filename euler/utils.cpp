@@ -50,10 +50,10 @@ void Euler::update_q(){
     q[idx][2] += rhs[idx][2];
     q[idx][3] += rhs[idx][3];
 
-    if(errc < 5 && q[idx][0] != q[idx][0]){
-      printf("found a nan at %d %d\n", j, k);
-      errc++;
-    }
+    // if(errc < 5 && q[idx][0] != q[idx][0]){
+    //   printf("found a nan at %d %d\n", j, k);
+    //   errc++;
+    // }
 
   }
   }

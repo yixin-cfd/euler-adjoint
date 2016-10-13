@@ -19,7 +19,7 @@ void Euler::timestep(){
 
     u  = q[idx][1]*irho;
     v  = q[idx][2]*irho;
-    p  = (GAMMA-1.0)*(q[idx][3] - 0.5*(q[idx][1]*q[idx][1] + q[idx][2]*q[idx][2])*irho);
+    p  = (GAMMA-1.0)*(q[idx][3] - 0.5*q[idx][0]*(u*u + v*v));
     c2 = GAMMA*p*irho;
 
     // contravariant velocities in coordinate directions

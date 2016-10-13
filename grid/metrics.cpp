@@ -59,10 +59,10 @@ void Grid::metrics(){
   //
   int idx1, idx2, idx3, idx4;
   double diag1_x, diag1_y, diag2_x, diag2_y;
-  for(k=dim->nghost; k<ktot-dim->nghost; k++){
-    for(j=dim->nghost; j<jtot-dim->nghost; j++){
-  // for(k=0; k<ktot-1; k++){
-  //   for(j=0; j<jtot-1; j++){
+  // for(k=dim->nghost; k<ktot-dim->nghost; k++){
+  //   for(j=dim->nghost; j<jtot-dim->nghost; j++){
+  for(k=0; k<ktot-1; k++){
+    for(j=0; j<jtot-1; j++){
       
       idx1 = j*jstride + k*kstride;
       idx2 = idx1 + jstride;
@@ -79,49 +79,49 @@ void Grid::metrics(){
     }
   }
 
-  // //
-  // // Edge
-  // //
-  // k = ktot-1;
-  // for(j=0; j<jtot-1; j++){
-  //   idx = j*jstride + k*kstride;
-  //   V[idx] = V[idx-kstride];
-  // }
-  // j = jtot-1;
-  // for(k=0; k<ktot; k++){ // plus last point too
-  //   idx = j*jstride + k*kstride;
-  //   V[idx] = V[idx-jstride];
-  // }
-  
-  // 
-  // Ghosts
   //
-  // j-direction
-  for(k=0; k < dim->ktot; k++){
-    for(j=0; j<dim->nghost; j++){
-      idx1 = dim->nghost*jstride + k*kstride;
-      idx2 = j*jstride + k*kstride;
-      V[idx2] = V[idx1];
-    }
-    for(j=dim->jtot-dim->nghost; j<dim->jtot; j++){
-      idx1 = (dim->jtot-dim->nghost-1)*jstride + k*kstride;
-      idx2 = j*jstride + k*kstride;
-      V[idx2] = V[idx1];
-    }    
+  // Edge
+  //
+  k = ktot-1;
+  for(j=0; j<jtot-1; j++){
+    idx = j*jstride + k*kstride;
+    V[idx] = V[idx-kstride];
   }
-  // k-direction
-  for(j=0; j<dim->jtot; j++){
-    for(k=0; k<dim->nghost; k++){
-      idx1 = j*jstride + dim->nghost*kstride;
-      idx2 = j*jstride + k*kstride;
-      V[idx2] = V[idx1];
-    }
-    for(k=dim->ktot-dim->nghost; k<dim->ktot; k++){
-      idx1 = j*jstride + (dim->ktot-dim->nghost-1)*kstride;
-      idx2 = j*jstride + k*kstride;
-      V[idx2] = V[idx1];
-    }
+  j = jtot-1;
+  for(k=0; k<ktot; k++){ // plus last point too
+    idx = j*jstride + k*kstride;
+    V[idx] = V[idx-jstride];
   }
+  
+  // // 
+  // // Ghosts
+  // //
+  // // j-direction
+  // for(k=0; k < dim->ktot; k++){
+  //   for(j=0; j<dim->nghost; j++){
+  //     idx1 = dim->nghost*jstride + k*kstride;
+  //     idx2 = j*jstride + k*kstride;
+  //     V[idx2] = V[idx1];
+  //   }
+  //   for(j=dim->jtot-dim->nghost; j<dim->jtot; j++){
+  //     idx1 = (dim->jtot-dim->nghost-1)*jstride + k*kstride;
+  //     idx2 = j*jstride + k*kstride;
+  //     V[idx2] = V[idx1];
+  //   }    
+  // }
+  // // k-direction
+  // for(j=0; j<dim->jtot; j++){
+  //   for(k=0; k<dim->nghost; k++){
+  //     idx1 = j*jstride + dim->nghost*kstride;
+  //     idx2 = j*jstride + k*kstride;
+  //     V[idx2] = V[idx1];
+  //   }
+  //   for(k=dim->ktot-dim->nghost; k<dim->ktot; k++){
+  //     idx1 = j*jstride + (dim->ktot-dim->nghost-1)*kstride;
+  //     idx2 = j*jstride + k*kstride;
+  //     V[idx2] = V[idx1];
+  //   }
+  // }
 
 
 }

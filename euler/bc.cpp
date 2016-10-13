@@ -79,11 +79,13 @@ void wall_bc(BC bc, double (*q)[4], Dim *dim, Grid* grid){
 
       // normalize wall vector
       mag = sqrt(Sx*Sx + Sy*Sy);
-      if(mag > 1.0e-30){
-      	imag = 1.0 / mag;
-      } else {
-      	imag = 0;
-      }
+      imag = 1.0 / mag;
+      // if(mag > 1.0e-30){
+      // 	imag = 1.0 / mag;
+      // } else {
+      // 	imag = 0;
+      // }
+      
       Sx *= imag;
       Sy *= imag;
 
@@ -92,7 +94,7 @@ void wall_bc(BC bc, double (*q)[4], Dim *dim, Grid* grid){
       // find velocity on other side of wall
       u = q[midx][1]*irho;
       v = q[midx][2]*irho;
-      p = (GAMMA - 1)*(q[midx][3] - 0.5*q[midx][0]*(u*u + v*v));
+      p = (GAMMA - 1.0)*(q[midx][3] - 0.5*q[midx][0]*(u*u + v*v));
 
       // reflect normal component
       v_dot_wall = Sx * u + Sy * v;
@@ -102,7 +104,7 @@ void wall_bc(BC bc, double (*q)[4], Dim *dim, Grid* grid){
       q[idx][0] = q[midx][0];
       q[idx][1] = u*q[midx][0];
       q[idx][2] = v*q[midx][0];
-      q[idx][3] = p / (GAMMA - 1) + 0.5*q[midx][0]*(u*u + v*v);
+      q[idx][3] = p / (GAMMA - 1.0) + 0.5*q[midx][0]*(u*u + v*v);
 
   }
   }
