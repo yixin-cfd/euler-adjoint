@@ -35,6 +35,8 @@ class Euler {
   // int write_to_file(std::string s);
   // void metrics();
 
+  boost::python::object pressure();
+
   int step_number;
 
   double (*f)[4];

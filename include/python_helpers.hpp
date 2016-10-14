@@ -7,7 +7,11 @@
 #include "boost/python/extract.hpp"
 // http://docs.scipy.org/doc/numpy/reference/c-api.array.html#miscellaneous
 
-boost::python::object double_array_to_numpy(double* x, int len);
+
+template <typename T>
+boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed);
+
+// boost::python::object double_array_to_numpy(double* x, int len);
 
 boost::python::object int_array_to_numpy(int* x, int len);
 

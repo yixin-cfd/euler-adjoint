@@ -24,6 +24,7 @@ BOOST_PYTHON_MODULE(libflow){
     .def("write_solution", &Euler::write_solution)
     .def("go",&Euler::go)
     .def("take_steps",&Euler::take_steps)
+    .def("pressure",&Euler::pressure)
     ;
 
 }
