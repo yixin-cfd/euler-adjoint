@@ -36,6 +36,7 @@ class Euler {
   // void metrics();
 
   boost::python::object pressure();
+  boost::python::object Cl_Cd_Cm();
 
   int step_number;
 

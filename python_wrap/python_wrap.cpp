@@ -25,6 +25,7 @@ BOOST_PYTHON_MODULE(libflow){
     .def("go",&Euler::go)
     .def("take_steps",&Euler::take_steps)
     .def("pressure",&Euler::pressure)
+    .def("Cl_Cd_Cm", &Euler::Cl_Cd_Cm)
     ;
 
 }
