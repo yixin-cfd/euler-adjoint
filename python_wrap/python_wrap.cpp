@@ -7,7 +7,7 @@
 #include <string>
 #include "grid.hpp"
 #include "euler.hpp"
-
+#include "meshgen.hpp"
 
 BOOST_PYTHON_MODULE(libflow){
 
@@ -18,6 +18,13 @@ BOOST_PYTHON_MODULE(libflow){
   class_<Grid>("Grid", init<object,int>())
     .def("write_to_file", &Grid::write_to_file)
     ;
+
+  class_<MeshGen>("MeshGen", init<object,int,double>())
+    .def("write_to_file", &MeshGen::write_to_file)
+    .def("poisson",&MeshGen::poisson)
+    ;
+  // class_<MeshGen>("MeshGen", init<object,int,double>());
+
 
   class_<Euler>("Euler", init<Grid*,std::string>())
     .def("say_hello", &Euler::say_hello)

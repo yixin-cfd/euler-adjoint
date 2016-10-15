@@ -39,6 +39,21 @@ set(INCLUDE_DIRS ${2DFLOW_SOURCE_DIR}/include
 		 ${mpi4py_inc})
 
 #
+# Library: meshgen
+#
+file(GLOB meshgen_sources "${2DFLOW_SOURCE_DIR}/meshgen/*.cpp")
+
+add_library(meshgen SHARED ${meshgen_sources})
+
+set_target_properties(meshgen PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  )
+target_compile_definitions(meshgen PRIVATE ${DEBUG_DEFINITION})
+target_include_directories(meshgen PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(meshgen ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+	       
+#
 # Library: grid
 #
 file(GLOB grid_sources "${2DFLOW_SOURCE_DIR}/grid/*.cpp")
@@ -83,6 +98,6 @@ set_target_properties(flow PROPERTIES
   )
 target_compile_definitions(flow PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(flow PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(flow euler grid ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(flow euler grid meshgen ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #target_link_libraries(flow ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
