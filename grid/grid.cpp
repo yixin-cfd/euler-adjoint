@@ -1,10 +1,11 @@
 #include "grid.hpp"
-#define NO_IMPORT_ARRAY
-#define PY_ARRAY_UNIQUE_SYMBOL flow_ARRAY_API
+#define PY_ARRAY_UNIQUE_SYMBOL grid_ARRAY_API
 #include <numpy/ndarrayobject.h>
 
 // o is numpy array with shape [K, J, 2]
 Grid::Grid(boost::python::object o, int ng){
+
+  import_array();
 
   PyArrayObject *arr = (PyArrayObject*) o.ptr();
 

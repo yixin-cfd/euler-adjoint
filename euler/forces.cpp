@@ -1,5 +1,8 @@
-#include "python_helpers.hpp"
 #include "euler.hpp"
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL euler_ARRAY_API
+#include <numpy/ndarrayobject.h>
+#include "python_helpers.hpp"
 
 boost::python::object Euler::pressure(){
 
@@ -15,7 +18,7 @@ boost::python::object Euler::pressure(){
   if(not found){
     return boost::python::object(); // None object
   }
-  if(not wallbc.face == KMIN_FACE){
+  if(wallbc.face != KMIN_FACE){
     printf("Only KMIN faces can be pressure walls\n");
     throw 432;
   }
@@ -84,7 +87,7 @@ boost::python::object Euler::Cl_Cd_Cm(){
   if(not found){
     return boost::python::object(); // None object
   }
-  if(not wallbc.face == KMIN_FACE){
+  if(wallbc.face != KMIN_FACE){
     printf("Only KMIN faces can be pressure walls\n");
     throw 432;
   }

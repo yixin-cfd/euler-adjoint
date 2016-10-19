@@ -38,12 +38,16 @@ set(INCLUDE_DIRS ${2DFLOW_SOURCE_DIR}/include
 		 ${PYTHON_INCLUDE_DIRS}
 		 ${mpi4py_inc})
 
+file(GLOB python_utils "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+
 #
 # Library: meshgen
 #
-file(GLOB meshgen_sources "${2DFLOW_SOURCE_DIR}/meshgen/*.cpp")
+file(GLOB meshgen_sources "${2DFLOW_SOURCE_DIR}/meshgen/*.cpp" "${2DFLOW_SOURCE_DIR}/meshgen/*.c")
 
 add_library(meshgen SHARED ${meshgen_sources})
+
+set_property( TARGET meshgen APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
 
 set_target_properties(meshgen PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
@@ -56,9 +60,11 @@ target_link_libraries(meshgen ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES}
 #
 # Library: grid
 #
-file(GLOB grid_sources "${2DFLOW_SOURCE_DIR}/grid/*.cpp")
+file(GLOB grid_sources "${2DFLOW_SOURCE_DIR}/grid/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
 
 add_library(grid SHARED ${grid_sources})
+
+set_property( TARGET grid APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
 
 set_target_properties(grid PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
@@ -71,9 +77,11 @@ target_link_libraries(grid ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #
 # Library: euler
 #
-file(GLOB euler_sources "${2DFLOW_SOURCE_DIR}/euler/*.cpp")
+file(GLOB euler_sources "${2DFLOW_SOURCE_DIR}/euler/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
 
 add_library(euler SHARED ${euler_sources})
+
+set_property( TARGET euler APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
 
 set_target_properties(euler PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib

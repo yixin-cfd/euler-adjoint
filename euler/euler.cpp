@@ -1,8 +1,12 @@
 #include "euler.hpp"
 #include "yaml-cpp/yaml.h"
+#define PY_ARRAY_UNIQUE_SYMBOL euler_ARRAY_API
+#include <numpy/ndarrayobject.h>
 
 
 Euler::Euler(Grid *g, std::string yaml_string){
+
+  import_array(); // make sure numpy is loaded
 
   YAML::Node inputs = YAML::Load(yaml_string);
 

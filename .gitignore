@@ -4,3 +4,4 @@ build/*
 python/*.pyc
 TAGS
 test/*
+*/scratch/*
