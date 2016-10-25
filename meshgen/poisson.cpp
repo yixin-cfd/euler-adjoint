@@ -1,6 +1,6 @@
 #include "meshgen.hpp"
 #include "slor.h"
-
+#include "ss.h"
 
 void MeshGen::poisson(int n){
 
@@ -16,7 +16,8 @@ void MeshGen::poisson(int n){
 
   for(int i=0; i<n; i++){
 
-    fill_PQ(P, Q, x, y, dim->jtot, dim->ktot);
+    //middlecoff_PQ(P, Q, x, y, dim->jtot, dim->ktot);
+    ss_PQ(P,Q,x,y,dim->jtot,dim->ktot);
 
     if(i%10 == 1){
       res = residual(x,y,(double*)rhs,P,Q,dim->jtot,dim->ktot);

@@ -1,7 +1,7 @@
 
 extern "C" {
 
-void fill_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, int jtot, int ktot);
+void middlecoff_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, int jtot, int ktot);
 
 double residual(double *x1D, double *y1D, double *rhs1D, double *P1D, double *Q1D,
 		int jtot, int ktot);
