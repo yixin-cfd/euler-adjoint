@@ -23,7 +23,7 @@ void tri(double *a, double *b, double *c, double *d, int n){
 }
 
 
-void fill_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, int jtot, int ktot){
+void middlecoff_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, int jtot, int ktot){
 
   double A1, A3, iJ, x_eta,y_eta,x_xi,y_xi;
   double x_xi_xi, y_xi_xi, x_eta_eta, y_eta_eta;
