@@ -19,9 +19,9 @@ void MeshGen::poisson(int n){
     //middlecoff_PQ(P, Q, x, y, dim->jtot, dim->ktot);
     ss_PQ(P,Q,x,y,dim->jtot,dim->ktot);
 
-    if(i%10 == 1){
+    if((i+1)%10 == 0){
       res = residual(x,y,(double*)rhs,P,Q,dim->jtot,dim->ktot);
-      printf("residual : %e\n", res);
+      printf("L2 Residual %4d : %e\n", i+1, res);
     }
     
     slor(w, x, y, (double*)rhs, P, Q, a, b, c, d, dim->jtot, dim->ktot);

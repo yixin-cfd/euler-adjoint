@@ -1,10 +1,11 @@
 #include "meshgen.hpp"
-#define NO_IMPORT_ARRAY
-#define PY_ARRAY_UNIQUE_SYMBOL flow_ARRAY_API
+#define PY_ARRAY_UNIQUE_SYMBOL mesh_ARRAY_API
 #include <numpy/ndarrayobject.h>
-
+// #include "python_helpers.hpp"
 
 MeshGen::MeshGen(boost::python::object o, int ktot, double dist){
+
+  import_array();
 
   PyArrayObject *arr = (PyArrayObject*) o.ptr();
 
@@ -48,7 +49,7 @@ MeshGen::MeshGen(boost::python::object o, int ktot, double dist){
   Q   = new double[dim->pts];
   rhs = new double[dim->pts][2];
 
-  int idx1, idx2;
+  int idx1;
   k = 0;
   for(j=0; j<=dim->jtot; j++){
     idx1 = j*jstride + k*kstride;
@@ -59,7 +60,6 @@ MeshGen::MeshGen(boost::python::object o, int ktot, double dist){
   this->init(dist);
 
 }
-
 
 MeshGen::~MeshGen(){
 

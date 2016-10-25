@@ -7,7 +7,7 @@
 #define CCC 0.45
 #define DDD 0.45
 
-#define OMEGA 0.5
+#define OMEGA 0.1
 
 void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, 
 	   int jtot, int ktot){
@@ -50,10 +50,10 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
 				// the wake
     x_xi     = (x[k][j+1]-x[k][j-1])/2.0;
     y_xi     = (y[k][j+1]-y[k][j-1])/2.0;
-    gamma = x_xi*x_xi   + y_xi*y_xi;
+    gamma    = x_xi*x_xi   + y_xi*y_xi;
     tmp      = 1.0/sqrt(gamma);
-    x_eta[j] = sn * (-x_xi) * tmp;
-    y_eta[j] = sn * (-y_xi) * tmp;
+    x_eta[j] = sn * (-y_xi) * tmp;
+    y_eta[j] = sn * ( x_xi) * tmp;
   }
   
   k = 0;
@@ -66,7 +66,7 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
     beta  = x_xi*x_eta[j]  + y_xi*y_eta[j];
     gamma = x_xi*x_xi   + y_xi*y_xi;
     iJ    =   1.0/(x_xi *y_eta[j] - y_xi*x_eta[j] );
-    
+
     x_xi_xi   = x[k][j-1]-2.0*x[k][j]+x[k][j+1];
     y_xi_xi   = y[k][j-1]-2.0*y[k][j]+y[k][j+1];
     
@@ -99,10 +99,10 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
 				  // along the wake
     x_xi     = (x[k][j+1]-x[k][j-1])/2.0;
     y_xi     = (y[k][j+1]-y[k][j-1])/2.0;
-    gamma = x_xi*x_xi   + y_xi*y_xi;
+    gamma    = x_xi*x_xi   + y_xi*y_xi;
     tmp      = 1.0/sqrt(gamma);
-    x_eta[j] = sn * (-x_xi) * tmp;
-    y_eta[j] = sn * (-y_xi) * tmp;
+    x_eta[j] = sn * (-y_xi) * tmp;
+    y_eta[j] = sn * ( x_xi) * tmp;
   }
 
   for(j=1;j<jtot-1;j++){
@@ -132,7 +132,6 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
     r[j] = ( y_eta[j]*R3 - x_eta[j]*R4)*iJ;
     s[j] = (-y_xi*R3  + x_xi*R4)*iJ;
   }
-
 
   // ok now we have p,q,r,s for all j
   for(k=1; k<ktot-1; k++){

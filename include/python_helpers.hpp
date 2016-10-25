@@ -5,6 +5,38 @@
 #include <stdio.h>
 #include <boost/python.hpp>
 
+#define DOUBLE_TO_NUMPY(X, BO, DIMS, DDIM, BORROWED)	                                  \
+  npy_intp dims[DDIM];                                                                    \
+  for(int i=0; i<DDIM; i++){								  \
+    dims[i] = DIMS[i];									  \
+  }											  \
+  PyObject *pyObj;									  \
+  pyObj = PyArray_SimpleNewFromData(DDIM, dims, NPY_DOUBLE, (void*)X);	                  \
+											  \
+  if(BORROWED){										  \
+    BO = boost::python::object(boost::python::handle<>(boost::python::borrowed(pyObj)));  \
+  } else {										  \
+    PyArray_ENABLEFLAGS((PyArrayObject*)pyObj, NPY_ARRAY_OWNDATA);			  \
+    BO = boost::python::object(boost::python::handle<>(pyObj));				  \
+  } 											  \
+                                                                                          \
+
+#define INT_TO_NUMPY(X, BO, DIMS, DDIM, BORROWED)	                                  \
+  npy_intp dims[DDIM];                                                                    \
+  for(int i=0; i<DDIM; i++){								  \
+    dims[i] = DIMS[i];									  \
+  }											  \
+  PyObject *pyObj;									  \
+  pyObj = PyArray_SimpleNewFromData(DDIM, dims, NPY_INT, (void*)X);	                  \
+											  \
+  if(BORROWED){										  \
+    BO = boost::python::object(boost::python::handle<>(boost::python::borrowed(pyObj)));  \
+  } else {										  \
+    PyArray_ENABLEFLAGS((PyArrayObject*)pyObj, NPY_ARRAY_OWNDATA);			  \
+    BO = boost::python::object(boost::python::handle<>(pyObj));				  \
+  } 											  \
+                                                                                          \
+
 // http://docs.scipy.org/doc/numpy/reference/c-api.array.html#miscellaneous
 
 
@@ -27,6 +59,8 @@ boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed){
     dims[i] = dim[i];
   }
 
+  printf("about to create py array\n");
+
   PyObject *pyObj;
   if(boost::is_same<T,int>::value){
     pyObj = PyArray_SimpleNewFromData(ndim, dims, NPY_INT, (void*)x);
@@ -35,6 +69,8 @@ boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed){
   } else {
     throw 234;
   }
+
+  printf("created it\n");
 
   boost::python::object bo;
 
@@ -52,7 +88,7 @@ boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed){
 // template boost::python::object array_to_numpy<double>;
 // template boost::python::object array_to_numpy<int>;
 
-void compilerhelp(){
+void ccompilerhelp(){
   array_to_numpy<double>(NULL, NULL, 1, true);
   array_to_numpy<int>(NULL, NULL, 1, true);
 }

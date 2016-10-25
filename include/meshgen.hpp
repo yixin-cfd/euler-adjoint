@@ -19,6 +19,7 @@ class MeshGen {
   ~MeshGen();
   void init(double dist);
   int write_to_file(std::string s);
+  boost::python::object get_mesh();
   void poisson(int n);
 };
 

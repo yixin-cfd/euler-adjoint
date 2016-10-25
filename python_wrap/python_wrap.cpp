@@ -2,8 +2,8 @@
 #include <Python.h>
 #include <stdio.h>
 #include <boost/python.hpp>
-#define PY_ARRAY_UNIQUE_SYMBOL flow_ARRAY_API
-#include <numpy/ndarrayobject.h>
+//#define PY_ARRAY_UNIQUE_SYMBOL flow_ARRAY_API
+//#include <numpy/ndarrayobject.h>
 #include <string>
 #include "grid.hpp"
 #include "euler.hpp"
@@ -13,8 +13,6 @@ BOOST_PYTHON_MODULE(libflow){
 
   using namespace boost::python;
 
-  import_array();
-
   class_<Grid>("Grid", init<object,int>())
     .def("write_to_file", &Grid::write_to_file)
     ;
@@ -22,6 +20,7 @@ BOOST_PYTHON_MODULE(libflow){
   class_<MeshGen>("MeshGen", init<object,int,double>())
     .def("write_to_file", &MeshGen::write_to_file)
     .def("poisson",&MeshGen::poisson)
+    .def("get_mesh",&MeshGen::get_mesh)
     ;
   // class_<MeshGen>("MeshGen", init<object,int,double>());
 

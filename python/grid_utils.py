@@ -12,7 +12,7 @@ def load_grid(filename):
     return reordered
 
 
-def plot2d(filename):
+def plot_file(filename):
     with open(filename, "r") as f:
         jtot, ktot = [int(x) for x in f.readline().split()]
     
@@ -24,3 +24,22 @@ def plot2d(filename):
     for j in range(jtot):
         plt.plot(data[0,:,j], data[1,:,j], '-b')
     plt.show()
+
+def plot_xy(lxy):
+    patts = ['-b', '-r', '-g', '-m', '-k']
+    patts = patts + patts + patts
+    patts = patts[::-1]
+    if(type(lxy) != list):
+        lxy = [lxy]
+    for xy in lxy:
+        ktot, jtot, nv = xy.shape
+        patt = patts.pop()
+        if(nv != 2):
+            print "incorrect number of vars"
+            return
+        for k in range(ktot):
+            plt.plot(xy[k,:,0], xy[k,:,1], patt)
+        for j in range(jtot):
+            plt.plot(xy[:,j,0], xy[:,j,1], patt)
+    plt.show()
+    

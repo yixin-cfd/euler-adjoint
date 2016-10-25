@@ -1,6 +1,6 @@
 #include "meshgen.hpp"
 
-#define XSF 1.08
+#define XSF 1.12
 
 void MeshGen::init(double dist){
 
@@ -31,7 +31,7 @@ void MeshGen::init(double dist){
 
   double xmax = x[(ktot-1)*kstride];
 
-  printf("warning: not using dist. How close? %f vs %f\n", dist, xmax);
+  // printf("warning: not using dist. How close? %f vs %f\n", dist, xmax);
 
   j = jtot-1;
   for(k=1;k<ktot;k++){
