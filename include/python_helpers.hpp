@@ -59,8 +59,6 @@ boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed){
     dims[i] = dim[i];
   }
 
-  printf("about to create py array\n");
-
   PyObject *pyObj;
   if(boost::is_same<T,int>::value){
     pyObj = PyArray_SimpleNewFromData(ndim, dims, NPY_INT, (void*)x);
@@ -69,8 +67,6 @@ boost::python::object array_to_numpy(T* x, int* dim, int ndim, bool borrowed){
   } else {
     throw 234;
   }
-
-  printf("created it\n");
 
   boost::python::object bo;
 
