@@ -20,6 +20,32 @@ def hh1(x, y, xmi, w, mag):
             yy[i] = yy[i]+mag[j]*np.sin(np.pi*x[i]**m[j])**w
     return yy
 
+def perturb(x, y, design_vars):
+    half = (x.shape[0]-1)/2
+
+    xu = x[:half]
+    xl = x[half:]
+    yu = y[:half]
+    yl = y[half:]
+
+    locu = design_vars[0]
+    locl = design_vars[1]
+    magu = design_vars[2]
+    magl = design_vars[3]
+    w   = 2.0
+
+    yy   = np.zeros_like(y)
+
+    yu1 = hh1(xu,yu,locu,w,magu)
+    yl1 = hh1(xl,yl,locl,w,magl)
+    
+    yy[:half] = yu1
+    yy[half:] = yl1
+
+    return yy
+
+    
+
 
 if __name__ == "__main__":
 
