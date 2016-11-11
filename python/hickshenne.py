@@ -17,7 +17,7 @@ def hh1(x, y, xmi, w, mag):
     yy = np.copy(y)
     for i in range(len(x)):
         for j in range(len(m)):
-            yy[i] = yy[i]+mag[j]*np.sin(np.pi*x[i]**m[j])**w[j]
+            yy[i] = yy[i]+mag[j]*np.sin(np.pi*x[i]**m[j])**w
     return yy
 
 def perturb(airfoil, design_vars):
@@ -25,25 +25,24 @@ def perturb(airfoil, design_vars):
     y = airfoil[:,1]
     half = (x.shape[0]-1)/2
 
-    xu = x[:half]
-    xl = x[half:]
-    yu = y[:half]
-    yl = y[half:]
+    xl = x[:half]
+    xu = x[half:]
+    yl = y[:half]
+    yu = y[half:]
 
-    locu = design_vars[0,:,0]
-    locl = design_vars[1,:,0]
-    magu = design_vars[0,:,1]
-    magl = design_vars[1,:,1]
-    wu   = design_vars[0,:,2]
-    wl   = design_vars[1,:,2]
+    locl = design_vars[0,:]
+    locu = design_vars[1,:]
+    magl = design_vars[2,:]
+    magu = design_vars[3,:]
+    w    = 2.0
 
     yy   = np.zeros_like(y)
 
-    yu1 = hh1(xu,yu,locu,wu,magu)
-    yl1 = hh1(xl,yl,locl,wl,magl)
+    yl1 = hh1(xl,yl,locl,w,magl)
+    yu1 = hh1(xu,yu,locu,w,magu)
     
-    yy[:half] = yu1
-    yy[half:] = yl1
+    yy[:half] = yl1
+    yy[half:] = yu1
 
     new_airfoil = np.copy(airfoil)
     new_airfoil[:,1] = yy

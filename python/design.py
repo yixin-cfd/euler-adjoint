@@ -2,7 +2,7 @@ import numpy as np
 import sys
 sys.path.append('../build/lib')
 import libflow
-import grid_utils, euler_utils
+import grid_utils, euler_utils, hickshenne
 import yaml
 
 def solve_p(airfoil,inputs):
@@ -10,32 +10,48 @@ def solve_p(airfoil,inputs):
     mg.poisson(500)
     xy  = mg.get_mesh()
     del mg
-
+    #
     grid  = libflow.Grid(xy, 1)
     euler = libflow.Euler(grid, yaml.dump(inputs))
     euler.go()
     p = euler.pressure()
     return p
 
+def find_cost(p1, p2):
+    return np.float64(np.sum((p1-p2)**2))
+
 class Design:
     def __init__(self, obj, inputs):
-        assert(obj.hasKey("desired_pressure"))
-        assert(obj.hasKey("base_airfoil"))
-        self.desired     = obj['desired_pressure']
-        self.airfoils    = [obj['base_airfoil']]
-        self.design_vars = obj['design_vars']
+        assert("desired_pressure" in obj)
+        assert("base_airfoil" in obj)
+        self.desired      = obj['desired_pressure']
+        self.design_vars  = obj['design_vars']
+        self.inputs       = inputs
+        self.base_airfoil = obj['base_airfoil']
+        self.airfoils     = []
+        self.pressures    = []
+
+        # add our airfoil to the list and the pressure too
+        airfoil1 = hickshenne.perturb(self.base_airfoil, self.design_vars)
+        self.airfoils.append(airfoil1)
+        pressure = solve_p(airfoil1, inputs)
+        self.pressures.append(pressure)
+        print "start cost: ", find_cost(pressure, self.desired)
+
+    def brute_sensitivities(self, eps):
+        s        = np.zeros(self.design_vars.size)
+        pressure = self.pressures[-1]
+        cost     = find_cost(pressure, self.desired)
         
-        mg  = libflow.MeshGen(airfoil, ktot, 5.0)
-        mg.poisson(500)
-        self.base_xy  = mg.get_mesh()
-        del mg
-
-        grid  = libflow.Grid(self.base_xy, 1)
-        euler = libflow.Euler(grid, yaml.dump(inputs))
-        euler.take_steps(1000)
-        self.base_p = euler.pressure()
-        del euler
-        del grid
-
+        for i in range(s.shape[0]/2, s.shape[0]):
+            dvars = self.design_vars.flatten() # return flat copy of array
+            dvars[i] += eps
+            airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
+            new_pressure = solve_p(airfoil1, self.inputs)
+            new_cost     = find_cost(new_pressure, self.desired)
+            s[i] = (new_cost - cost) / eps
+            print "%d: (%e - %e) / %e = %e"%(i,new_cost, cost, eps, s[i])
+        
+        return s.reshape(self.design_vars.shape)
         
 

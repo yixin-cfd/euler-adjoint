@@ -58,6 +58,4 @@ Euler::~Euler(){
   delete rhs;
   delete dt;
 
-  printf("good bye\n");
-
 }

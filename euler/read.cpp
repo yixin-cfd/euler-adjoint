@@ -20,7 +20,6 @@ void Euler::read_inputs(std::string yaml_string){
   inputs->resid = yaml["resid"].as<int>();
   inputs->nbc   = nbc;
 
-  printf("ok with inputs\n");
   for(i=0; i<nbc; i++){
 
     std::string face = yaml["bcs"][i]["face"].as<std::string>();
@@ -77,9 +76,9 @@ void Euler::read_inputs(std::string yaml_string){
 
   }
 
-  for(i=0; i<nbc; i++){
-    printf("%d, %d: %d %d %d %d\n", (int)bc[i].face, (int)bc[i].type, 
-	   bc[i].js, bc[i].je, bc[i].ks, bc[i].ke);
-  }
+  // for(i=0; i<nbc; i++){
+  //   printf("%d, %d: %d %d %d %d\n", (int)bc[i].face, (int)bc[i].type, 
+  // 	   bc[i].js, bc[i].je, bc[i].ks, bc[i].ke);
+  // }
 
 }
