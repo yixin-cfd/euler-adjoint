@@ -1,4 +1,5 @@
 #include "euler.hpp"
+#include "euler_routines.h"
 
 void Euler::take_steps(int n){
   for(int i=0; i<n; i++){
@@ -18,7 +19,8 @@ void Euler::step(){
 
   memset(rhs, 0, dim->pts*4*sizeof(double));
 
-  this->timestep();
+  //this->timestep();
+  timestep(q, grid->Sj, grid->Sk, grid->V, dim, inputs->cfl, dt);
 
   this->boundary_conditions();
 

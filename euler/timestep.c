@@ -1,7 +1,10 @@
-#include "euler.hpp"
+#include "structures.h"
+#include "euler_routines.h"
+#include <math.h>
+#include <stdlib.h>
 
-void Euler::timestep(){
-
+void timestep(double (*q)[4], double (*Sj)[2], double (*Sk)[2],  
+	      double *V, Dim *dim, double cfl, double *dt){
   //
   // Constant-CFL timestep
   //
@@ -23,20 +26,20 @@ void Euler::timestep(){
     c2 = GAMMA*p*irho;
 
     // contravariant velocities in coordinate directions
-    uu = u*grid->Sj[idx][0] + v*grid->Sj[idx][1];
-    vv = u*grid->Sk[idx][0] + v*grid->Sk[idx][1];
+    uu = u*Sj[idx][0] + v*Sj[idx][1];
+    vv = u*Sk[idx][0] + v*Sk[idx][1];
 
     // face sizes squared
-    xs2 = (grid->Sj[idx][0]*grid->Sj[idx][0] + grid->Sj[idx][1]*grid->Sj[idx][1]);
-    ys2 = (grid->Sk[idx][0]*grid->Sk[idx][0] + grid->Sk[idx][1]*grid->Sk[idx][1]);
+    xs2 = (Sj[idx][0]*Sj[idx][0] + Sj[idx][1]*Sj[idx][1]);
+    ys2 = (Sk[idx][0]*Sk[idx][0] + Sk[idx][1]*Sk[idx][1]);
     
     xsc = sqrt(c2*xs2);
     ysc = sqrt(c2*ys2);
 
     //eigmax = std::abs(uu) + xsc + std::abs(vv) + ysc;
-    eigmax = std::max( std::abs(uu) + xsc, std::abs(vv) + ysc );
+    eigmax = fmax( abs(uu) + xsc, abs(vv) + ysc );
 
-    dt[idx] = inputs->cfl * grid->V[idx] / eigmax;
+    dt[idx] = cfl * V[idx] / eigmax;
 
   }
   }

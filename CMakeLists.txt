@@ -77,7 +77,7 @@ target_link_libraries(grid ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #
 # Library: euler
 #
-file(GLOB euler_sources "${2DFLOW_SOURCE_DIR}/euler/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+file(GLOB euler_sources "${2DFLOW_SOURCE_DIR}/euler/*.c" "${2DFLOW_SOURCE_DIR}/euler/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
 
 add_library(euler SHARED ${euler_sources})
 

@@ -12,7 +12,7 @@ class Euler {
 
   void read_inputs(std::string yaml_string);
   void init();
-  void timestep();
+  // void timestep();
   void boundary_conditions();
   void flux();
   double rhs_times_dt();
@@ -32,6 +32,8 @@ class Euler {
   void take_steps(int n);
   void go();
   void step();
+  void save_restart(std::string fname);
+  void read_restart(std::string fname);
   // int write_to_file(std::string s);
   // void metrics();
 
