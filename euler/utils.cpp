@@ -39,7 +39,7 @@ double Euler::rhs_times_dt(){
 void Euler::update_q(){
 
   int idx, j, k;
-  int errc = 0;
+  // int errc = 0;
   for(k=dim->nghost; k<dim->kmax+dim->nghost; k++){
   for(j=dim->nghost; j<dim->jmax+dim->nghost; j++){
 

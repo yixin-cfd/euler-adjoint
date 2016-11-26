@@ -8,6 +8,7 @@
 #include "grid.hpp"
 #include "euler.hpp"
 #include "meshgen.hpp"
+#include "adadj.hpp"
 
 BOOST_PYTHON_MODULE(libflow){
 
@@ -24,7 +25,6 @@ BOOST_PYTHON_MODULE(libflow){
     ;
   // class_<MeshGen>("MeshGen", init<object,int,double>());
 
-
   class_<Euler>("Euler", init<Grid*,std::string>())
     .def("say_hello", &Euler::say_hello)
     .def("write_solution", &Euler::write_solution)
@@ -32,6 +32,12 @@ BOOST_PYTHON_MODULE(libflow){
     .def("take_steps",&Euler::take_steps)
     .def("pressure",&Euler::pressure)
     .def("Cl_Cd_Cm", &Euler::Cl_Cd_Cm)
+    .def("save_restart", &Euler::save_restart)    
+    .def("read_restart", &Euler::read_restart)
+    ;
+
+  class_<ADadj>("ADadj", init<Euler*>())
+    .def("init", &ADadj::init)
     ;
 
 }

@@ -92,6 +92,27 @@ target_include_directories(euler PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 #
+# Library: ADadj
+#
+file(GLOB adadj_sources "${2DFLOW_SOURCE_DIR}/adadj/*.c" "${2DFLOW_SOURCE_DIR}/adadj/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+
+add_library(adadj SHARED ${adadj_sources})
+
+set_property( TARGET adadj APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+
+set_target_properties(adadj PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  )
+
+
+
+target_compile_definitions(adadj PRIVATE ${DEBUG_DEFINITION})
+target_include_directories(adadj PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+
+
+#
 # Python Module for all libs
 #
 file(GLOB flow_sources   "${2DFLOW_SOURCE_DIR}/python_wrap/*.cpp" )
@@ -106,6 +127,6 @@ set_target_properties(flow PROPERTIES
   )
 target_compile_definitions(flow PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(flow PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(flow euler grid meshgen ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(flow euler grid meshgen adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #target_link_libraries(flow ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 

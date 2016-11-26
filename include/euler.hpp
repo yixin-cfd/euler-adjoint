@@ -19,11 +19,6 @@ class Euler {
   void update_q();
   void dadi();
 
-  Inputs *inputs;
-  BC *bc;
-  Grid *grid;
-  Dim *dim;
-
  public:
   Euler(Grid *g, std::string yaml_string);
   ~Euler();
@@ -46,6 +41,10 @@ class Euler {
   double (*q)[4];
   double (*rhs)[4];
   double *scratch, *dt;
+  Dim *dim;
+  BC *bc;
+  Grid *grid;
+  Inputs *inputs;
 
 };
 

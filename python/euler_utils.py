@@ -1,4 +1,4 @@
-
+import yaml
 
 def defaults():
     return { "mach" : 0.3,
@@ -14,3 +14,10 @@ def defaults():
                  { "face": "kmax", "type": "farfield", "j": [0,   -1], "k": [-1, -1] }
              ]
              }
+
+def read_inputs(filename):
+    inputs = defaults()
+    with open(filename, "r") as f:
+        inputs.update(yaml.load(f))
+    return inputs
+

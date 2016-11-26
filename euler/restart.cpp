@@ -34,6 +34,7 @@ void Euler::read_restart(std::string fname){
 
   if(test_jtot != dim->jtot || test_ktot != dim->ktot){
     printf("dimension mismatch, not reading restart\n");
+    return;
   }
 
   pts = dim->jtot*dim->ktot;
