@@ -19,6 +19,7 @@ ADadj::ADadj(Euler *e){
   dt      = new double[dim->pts];
 
   qb      = new double[dim->pts][4];
+  qb2     = new double[dim->pts][4];
   fb      = new double[dim->pts][4];
   rhsb    = new double[dim->pts][4];
   xyb     = new double[dim->pts][2];
@@ -39,6 +40,7 @@ ADadj::~ADadj(){
 
   delete fb;
   delete qb;
+  delete qb2;
   delete rhsb;
   delete dtb;
 

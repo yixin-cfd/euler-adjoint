@@ -28,12 +28,14 @@ class ADadj {
   double *scratch;
   double *p_des;
 
+  void boundary_conditions();
 
 public:
   ADadj(Euler *e);
   ~ADadj();
   void init(boost::python::object po);
   void step();
+
 
 };
 
