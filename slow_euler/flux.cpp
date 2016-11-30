@@ -1,4 +1,4 @@
-#include "structures.h"
+#include "slow_euler.hpp"
 
 void jroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
 	      double xy1[2], double xy2[2], int j){
@@ -80,33 +80,18 @@ void jroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
 
   // Dylan: this looks like Harten's Entropy Correction but I'm not sure
   double lambda_tilda;
-  eig_a1 = abs(eig_a1);
-  eig_a2 = abs(eig_a2);
-  eig_a3 = abs(eig_a3);
-  //lambda_tilda = max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
-  if(4.0*(eig_r1 - eig_l1) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
+  eig_a1 = std::abs(eig_a1);
+  eig_a2 = std::abs(eig_a2);
+  eig_a3 = std::abs(eig_a3);
+  lambda_tilda = std::max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
   if( eig_a1 < 0.5 * lambda_tilda ){
     eig_a1 = eig_a1*eig_a1 / (4.0*(eig_r1 - eig_l1) + 1e-6) +0.25*(4.0*(eig_r1 - eig_l1) + 1e-6);
   }
-
-  //lambda_tilda = max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
-  if(4.0*(eig_r2 - eig_l2) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
+  lambda_tilda = std::max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
   if( eig_a2 < 0.5 * lambda_tilda ){
     eig_a2 = eig_a2*eig_a2 / (4.0*(eig_r2 - eig_l2) + 1e-6) +0.25*(4.0*(eig_r2 - eig_l2) + 1e-6);
   }
-
-  //lambda_tilda = max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
-  if(4.0*(eig_r3 - eig_l3) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
-
+  lambda_tilda = std::max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
   if( eig_a3 < 0.5 * lambda_tilda ){
     eig_a3 = eig_a3*eig_a3 / (4.0*(eig_r3 - eig_l3) + 1e-6) +0.25*(4.0*(eig_r3 - eig_l3) + 1e-6);
   }
@@ -239,39 +224,39 @@ void kroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
   double eig_r2 = V_r + c_r; 
   double eig_r3 = V_r - c_r; 
 
+
   // Dylan: this looks like Harten's Entropy Correction but I'm not sure
   double lambda_tilda;
 
-  eig_a1 = abs(eig_a1);
-  eig_a2 = abs(eig_a2);
-  eig_a3 = abs(eig_a3);
-  //lambda_tilda = max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
-  if(4.0*(eig_r1 - eig_l1) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
+  eig_a1 = std::abs(eig_a1);
+  eig_a2 = std::abs(eig_a2);
+  eig_a3 = std::abs(eig_a3);
+  lambda_tilda = std::max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
   if( eig_a1 < 0.5 * lambda_tilda ){
     eig_a1 = eig_a1*eig_a1 / (4.0*(eig_r1 - eig_l1) + 1e-6) +0.25*(4.0*(eig_r1 - eig_l1) + 1e-6);
   }
-
-  //lambda_tilda = max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
-  if(4.0*(eig_r2 - eig_l2) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
+  lambda_tilda = std::max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
   if( eig_a2 < 0.5 * lambda_tilda ){
     eig_a2 = eig_a2*eig_a2 / (4.0*(eig_r2 - eig_l2) + 1e-6) +0.25*(4.0*(eig_r2 - eig_l2) + 1e-6);
   }
-
-  //lambda_tilda = max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
-  if(4.0*(eig_r3 - eig_l3) + 1e-6 > 0.0)
-    lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;
-  else
-    lambda_tilda = 0.0;
-
+  lambda_tilda = std::max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
   if( eig_a3 < 0.5 * lambda_tilda ){
     eig_a3 = eig_a3*eig_a3 / (4.0*(eig_r3 - eig_l3) + 1e-6) +0.25*(4.0*(eig_r3 - eig_l3) + 1e-6);
   }
+  // lambda_tilda   = 4.0*(eig_r1 - eig_l1) + 1e-6;
+  // lambda_tilda_s = fmax(lambda_tilda, 0.0);
+  // if(eig_a1 < 0.5*lambda_tilda_s)
+  //   eig_a1 = eig_a1*eig_a1/lambda_tilda + 0.25*lambda_tilda;
+
+  // lambda_tilda   = 4.0*(eig_r2 - eig_l2) + 1e-6;
+  // lambda_tilda_s = fmax(lambda_tilda, 0.0);
+  // if(eig_a2 < 0.5*lambda_tilda_s)
+  //   eig_a2 = eig_a2*eig_a2/lambda_tilda + 0.25*lambda_tilda;
+
+  // lambda_tilda   = 4.0*(eig_r3 - eig_l3) + 1e-6;
+  // lambda_tilda_s = fmax(lambda_tilda, 0.0);
+  // if(eig_a3 < 0.5*lambda_tilda_s)
+  //   eig_a3 = eig_a3*eig_a3/lambda_tilda + 0.25*lambda_tilda;
 
   double drho = rho_r - rho_l;
   double dp   = p_r - p_l;
@@ -325,6 +310,40 @@ void kroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
     rhs[1]    = rhs[1] + f[1];
     rhs[2]    = rhs[2] + f[2];
     rhs[3]    = rhs[3] + f[3];
+  }
+
+}
+
+void Slow_Euler::flux(){
+  
+  int j, k, idx;
+
+  //
+  // J-direction
+  //
+  for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
+  for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+
+    idx = j*dim->jstride + k*dim->kstride;
+
+    jroeflux(q[idx-dim->jstride], q[idx], rhs[idx-dim->jstride], rhs[idx], dim,
+	     grid->xy[idx], grid->xy[idx+dim->kstride], j);
+
+  }
+  }
+
+  //
+  // K-direction
+  //
+  for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
+  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+
+    idx = j*dim->jstride + k*dim->kstride;
+
+    kroeflux(q[idx-dim->kstride], q[idx], rhs[idx-dim->kstride], rhs[idx], dim,
+	     grid->xy[idx], grid->xy[idx+dim->jstride], k);
+
+  }
   }
 
 }

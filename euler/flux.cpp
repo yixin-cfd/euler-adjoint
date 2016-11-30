@@ -109,6 +109,11 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   //   // printf("lambdas %15.8e %15.8e %15.8e\n", eig_a1, eig_a2, eig_a3);
   // }
 
+  if(debug){
+    printf("_-_ %15.8e %15.8e %15.8e\n", eig_a1, eig_a2, eig_a3);
+  }
+
+
   double drho = rho_r - rho_l;
   double dp   = p_r - p_l;
   double du   = u_r - u_l;
@@ -161,9 +166,9 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
   f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
 
-  // if(debug){
-  //   printf("___ %15.8e %15.8e %15.8e %15.8e\n", f[0], f[1], f[2], f[3]);
-  // }
+  if(debug){
+    printf("_-_ %15.8e %15.8e %15.8e %15.8e\n", f[0], f[1], f[2], f[3]);
+  }
 
 }
 
@@ -179,7 +184,7 @@ void Euler::flux(){
   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
     idx = j*dim->jstride + k*dim->kstride;
-    roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx], (false && j==170 && k == 3));
+    roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx], (false && j==2 && k == 2));
 
     rhs[idx-dim->jstride][0] += (f[idx-dim->jstride][0] - f[idx][0])*(j>dim->nghost);
     rhs[idx-dim->jstride][1] += (f[idx-dim->jstride][1] - f[idx][1])*(j>dim->nghost);
@@ -193,6 +198,10 @@ void Euler::flux(){
   }
   }
 
+  // j=2; k=2;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("rhs_ %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
+
   // idx = (dim->nghost)*dim->jstride + 3*dim->kstride;
   // printf("rhs %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
 
@@ -203,7 +212,7 @@ void Euler::flux(){
   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 
     idx = j*dim->jstride + k*dim->kstride;
-    roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx], (false && j==190 && k == 4));
+    roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx], (false && j==2 && k == 2));
 
     rhs[idx-dim->kstride][0] += (f[idx-dim->kstride][0] - f[idx][0])*(k>dim->nghost);
     rhs[idx-dim->kstride][1] += (f[idx-dim->kstride][1] - f[idx][1])*(k>dim->nghost);
@@ -216,6 +225,11 @@ void Euler::flux(){
 
   }
   }
+
+  // j=2; k=2;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("rhs_ %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
+
 
   // idx = 190*dim->jstride + 3*dim->kstride;
   // int idx1 = idx + dim->kstride;

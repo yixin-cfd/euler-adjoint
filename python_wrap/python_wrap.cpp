@@ -7,6 +7,7 @@
 #include <string>
 #include "grid.hpp"
 #include "euler.hpp"
+#include "slow_euler.hpp"
 #include "meshgen.hpp"
 #include "adadj.hpp"
 
@@ -36,8 +37,20 @@ BOOST_PYTHON_MODULE(libflow){
     .def("read_restart", &Euler::read_restart)
     ;
 
+  class_<Slow_Euler>("Slow_Euler", init<Grid*,std::string>())
+    .def("say_hello", &Slow_Euler::say_hello)
+    .def("write_solution", &Slow_Euler::write_solution)
+    .def("go",&Slow_Euler::go)
+    .def("take_steps",&Slow_Euler::take_steps)
+    .def("pressure",&Slow_Euler::pressure)
+    .def("Cl_Cd_Cm", &Slow_Euler::Cl_Cd_Cm)
+    .def("save_restart", &Slow_Euler::save_restart)    
+    .def("read_restart", &Slow_Euler::read_restart)
+    ;
+
   class_<ADadj>("ADadj", init<Euler*>())
     .def("init", &ADadj::init)
+    .def("go",&ADadj::go)
     ;
 
 }

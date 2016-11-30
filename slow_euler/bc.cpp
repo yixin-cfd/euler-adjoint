@@ -1,4 +1,4 @@
-#include "euler.hpp"
+#include "slow_euler.hpp"
 
 template<BCface face>
 void periodic_bc(BC bc, double (*q)[4], Dim *dim){
@@ -40,7 +40,6 @@ void wall_bc(BC bc, double (*q)[4], Dim *dim, Grid* grid){
   int j, k, idx, widx, midx;
   int jstride = dim->jstride;
   int kstride = dim->kstride;
-  int pad = dim->nghost;
 
   double Sx, Sy, imag, mag;
 
@@ -113,8 +112,7 @@ void wall_bc(BC bc, double (*q)[4], Dim *dim, Grid* grid){
 
 void farfield_bc(BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
 
-  int j, k, idx, pidx;
-  int pad = dim->nghost;
+  int j, k, idx;
 
   for(k=bc.ks; k<=bc.ke; k++){
   for(j=bc.js; j<=bc.je; j++){
@@ -134,8 +132,7 @@ void farfield_bc(BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
 // slow start
 void ramp_bc(double ratio, BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
 
-  int j, k, idx, pidx;
-  int pad = dim->nghost;
+  int j, k, idx;
 
   for(k=bc.ks; k<=bc.ke; k++){
   for(j=bc.js; j<=bc.je; j++){
@@ -153,7 +150,7 @@ void ramp_bc(double ratio, BC bc, double (*q)[4], Dim *dim, Inputs *inputs){
 }
 
 
-void Euler::boundary_conditions(){
+void Slow_Euler::boundary_conditions(){
 
   int ramp = (step_number < 30);
   double ratio = 1.0;

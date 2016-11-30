@@ -92,6 +92,24 @@ target_include_directories(euler PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 #
+# Library: slow_euler
+#
+file(GLOB slow_euler_sources "${2DFLOW_SOURCE_DIR}/slow_euler/*.c" "${2DFLOW_SOURCE_DIR}/slow_euler/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+
+add_library(slow_euler SHARED ${slow_euler_sources})
+
+set_property( TARGET slow_euler APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+
+set_target_properties(slow_euler PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  )
+target_compile_definitions(slow_euler PRIVATE ${DEBUG_DEFINITION})
+target_include_directories(slow_euler PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(slow_euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+
+
+#
 # Library: ADadj
 #
 file(GLOB adadj_sources "${2DFLOW_SOURCE_DIR}/adadj/*.c" "${2DFLOW_SOURCE_DIR}/adadj/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
@@ -105,7 +123,7 @@ set_target_properties(adadj PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
   )
 
-
+list(APPEND INCLUDE_DIRS "$ENV{TAPENADE_HOME}/include")
 
 target_compile_definitions(adadj PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(adadj PUBLIC ${INCLUDE_DIRS})
@@ -127,6 +145,6 @@ set_target_properties(flow PROPERTIES
   )
 target_compile_definitions(flow PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(flow PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(flow euler grid meshgen adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(flow euler grid meshgen adadj slow_euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #target_link_libraries(flow ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 

@@ -21,6 +21,7 @@ class ADadj {
 
   double (*fb)[4];
   double (*qb)[4];
+  double (*qb2)[4];
   double (*rhsb)[4];
   double (*xyb)[2];
   double *dtb;
@@ -28,14 +29,18 @@ class ADadj {
   double *scratch;
   double *p_des;
 
-  void boundary_conditions();
+  int step_number;
+
+  void boundary_conditions(bool xbar);
+  void flux(bool xbar);
 
 public:
   ADadj(Euler *e);
   ~ADadj();
   void init(boost::python::object po);
   void step();
-
+  void check();
+  void go(int sn);
 
 };
 

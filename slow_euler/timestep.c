@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
-		 double cfl, double *dt){
+void slow_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
+		   double cfl, double *dt){
 
   // xy1  is j  , k   pt
   // xy2  is j+1, k   pt
@@ -41,8 +41,8 @@ void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
   xsc = sqrt(c2*xs2);
   ysc = sqrt(c2*ys2);
 
-  eigmax = abs(uu) + xsc + abs(vv) + ysc;
-  //eigmax = fmax( abs(uu) + xsc, abs(vv) + ysc );
+  //eigmax = abs(uu) + xsc + abs(vv) + ysc;
+  eigmax = fmax( abs(uu) + xsc, abs(vv) + ysc );
 
   // dt[0] = cfl * V[0] / eigmax;
 

@@ -6,14 +6,57 @@ extern "C" {
 
 
   void pressure_cost(double q[4], Dim *dim, double *J, double p_desired);
-  void timestep(double q[4], double Sj[2], double Sk[2],  
-		double *V, double cfl, double *dt);
+  void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
+		   double cfl, double *dt);
 
-  void pressure_cost_b(double q[4], double qb[4], Dim *dim, double *J, double *Jb, double p_desired);
-  void wall_bc_b(double (*q)[4], double (*qb)[4], Dim *dim, double xy1[2], 
-	       double xy1b[2], double xy2[2], double xy2b[2], int j, int k);
+  //
+  // QDIFF routines
+  //
+  void pressure_cost_b(double q[4], double qb[4], Dim *dim, double *J, double *
+		       Jb, double p_desired);
+
+  void ad_timestep_b(double q[4], double qb[4], double xy1[2], double xy2[2], 
+		  double xy3[2], double cfl, double *dt, double *dtb);
+
   void periodic_bc_b(double (*q)[4], double (*qb)[4], Dim *dim, BCface face, int
 		     j, int k);
+
+  void wall_bc_b(double (*q)[4], double (*qb)[4], Dim *dim, double xy1[2], 
+		 double xy2[2], int j, int k);
+
+  void jroeflux_b(double *q_l, double *q_lb, double *q_r, double *q_rb, double *
+		  rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
+		  xy1[2], double xy2[2], int j);
+
+  void kroeflux_b(double *q_l, double *q_lb, double *q_r, double *q_rb, double *
+		  rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
+		  xy1[2], double xy2[2], int k);
+
+  //
+  // XDIFF routines
+  //
+  void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2], 
+		   double xy2[2], double xy2b[2], double xy3[2], double xy3b[2], double 
+		   cfl, double *dt, double *dtb);
+
+  void wall_bc_bx(double (*q)[4], double (*qb)[4], Dim *dim, double xy1[2], 
+		  double xy1b[2], double xy2[2], double xy2b[2], int j, int k);
+
+  void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double 
+		   *rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
+		   xy1[2], double xy1b[2], double xy2[2], double xy2b[2], int j);
+
+  void kroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double 
+		   *rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
+		   xy1[2], double xy1b[2], double xy2[2], double xy2b[2], int k);
+
+
+
+
+
+
+
+
 
 #ifdef __cplusplus
 }

@@ -27,6 +27,8 @@ ADadj::ADadj(Euler *e){
 
   scratch = new double[dim->pts*4];
 
+  step_number = 0;
+
   printf("ADadj initialized\n");
 
 }
