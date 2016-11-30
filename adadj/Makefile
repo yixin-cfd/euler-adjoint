@@ -20,33 +20,33 @@ ALL :  pressure_cost_b.c timestep_b.c  timestep_bx.c periodic_bc_b.c wall_bc_b.c
 	jroeflux_b.c jroeflux_bx.c kroeflux_b.c kroeflux_bx.c
 
 pressure_cost_b.c : cost.c
-	${TPN} -reverse                                  \
-	       -inputlanguage  c                         \
-	       -outputlanguage c                         \
-	       -I              ../include                \
+	${TPN} -reverse                                   \
+	       -inputlanguage  c                          \
+	       -outputlanguage c                          \
+	       -I              ../include                 \
 	       -head           "pressure_cost(q J)/(q J)" \
-	       -adjfuncname    "_b"                     \
-	       -o pressure_cost \
+	       -adjfuncname    "_b"                       \
+	       -o pressure_cost                           \
 	       cost.c
 
 timestep_b.c : timestep.c
-	${TPN} -reverse                      \
-	       -inputlanguage  c             \
-	       -outputlanguage c             \
-	       -I              ../include    \
+	${TPN} -reverse                                   \
+	       -inputlanguage  c                          \
+	       -outputlanguage c                          \
+	       -I              ../include                 \
 	       -head           "ad_timestep(q dt)/(q dt)" \
-	       -adjfuncname    "_b"                     \
-	       -o timestep \
+	       -adjfuncname    "_b"                       \
+	       -o timestep                                \
 	       timestep.c
 
 periodic_bc_b.c : bc_routines.c
-	${TPN} -reverse                      \
-	       -inputlanguage  c             \
-	       -outputlanguage c             \
-	       -I              ../include    \
-	       -head           "periodic_bc(q)/(q)" \
+	${TPN} -reverse                                 \
+	       -inputlanguage  c                        \
+	       -outputlanguage c                        \
+	       -I              ../include               \
+	       -head           "periodic_bc(q)/(q)"     \
 	       -adjfuncname    "_b"                     \
-	       -o periodic_bc \
+	       -o periodic_bc                           \
 	       bc_routines.c
 
 wall_bc_b.c : bc_routines.c

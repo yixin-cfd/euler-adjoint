@@ -173,7 +173,7 @@ void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double
     double eig_r3 = V_r - c_r;
     double eig_r3b;
     // Dylan: this looks like Harten's Entropy Correction but I'm not sure
-    double lambda_tilda, lambda_tilda_s;
+    double lambda_tilda;
     if (eig_a1 >= 0.) {
         pushcontrol1b(0);
         eig_a1 = eig_a1;
@@ -195,32 +195,35 @@ void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double
         eig_a3 = -eig_a3;
         pushcontrol1b(1);
     }
-    if (4.0*(eig_r1-eig_l1) + 1e-6 < 0.0)
-        lambda_tilda = 0.0;
-    else
+    //lambda_tilda = max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
+    if (4.0*(eig_r1-eig_l1) + 1e-6 > 0.0)
         lambda_tilda = 4.0*(eig_r1-eig_l1) + 1e-6;
+    else
+        lambda_tilda = 0.0;
     if (eig_a1 < 0.5*lambda_tilda) {
         pushreal8(eig_a1);
         eig_a1 = eig_a1*eig_a1/(4.0*(eig_r1-eig_l1)+1e-6) + 0.25*(4.0*(eig_r1-
             eig_l1)+1e-6);
-        pushcontrol1b(1);
-    } else
         pushcontrol1b(0);
-    if (4.0*(eig_r2-eig_l2) + 1e-6 < 0.0)
-        lambda_tilda = 0.0;
+    } else
+        pushcontrol1b(1);
+    //lambda_tilda = max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
+    if (4.0*(eig_r2-eig_l2) + 1e-6 > 0.0)
+        lambda_tilda = 4.0*(eig_r1-eig_l1) + 1e-6;
     else
-        lambda_tilda = 4.0*(eig_r2-eig_l2) + 1e-6;
+        lambda_tilda = 0.0;
     if (eig_a2 < 0.5*lambda_tilda) {
         pushreal8(eig_a2);
         eig_a2 = eig_a2*eig_a2/(4.0*(eig_r2-eig_l2)+1e-6) + 0.25*(4.0*(eig_r2-
             eig_l2)+1e-6);
-        pushcontrol1b(1);
-    } else
         pushcontrol1b(0);
-    if (4.0*(eig_r3-eig_l3) + 1e-6 < 0.0)
-        lambda_tilda = 0.0;
+    } else
+        pushcontrol1b(1);
+    //lambda_tilda = max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
+    if (4.0*(eig_r3-eig_l3) + 1e-6 > 0.0)
+        lambda_tilda = 4.0*(eig_r1-eig_l1) + 1e-6;
     else
-        lambda_tilda = 4.0*(eig_r3-eig_l3) + 1e-6;
+        lambda_tilda = 0.0;
     if (eig_a3 < 0.5*lambda_tilda) {
         pushreal8(eig_a3);
         eig_a3 = eig_a3*eig_a3/(4.0*(eig_r3-eig_l3)+1e-6) + 0.25*(4.0*(eig_r3-
@@ -390,9 +393,6 @@ void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double
     }
     popcontrol1b(&branch);
     if (branch == 0) {
-        eig_r2b = 0.0;
-        eig_l2b = 0.0;
-    } else {
         popreal8(&eig_a2);
         tempb10 = eig_a2b/(4.0*(eig_r2-eig_l2)+1e-6);
         tempb11 = -(eig_a2*eig_a2*4.0*tempb10/(4.0*(eig_r2-eig_l2)+1e-6));
@@ -400,12 +400,12 @@ void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double
         eig_r2b = tempb12 + tempb11;
         eig_l2b = -tempb12 - tempb11;
         eig_a2b = 2*eig_a2*tempb10;
+    } else {
+        eig_r2b = 0.0;
+        eig_l2b = 0.0;
     }
     popcontrol1b(&branch);
     if (branch == 0) {
-        eig_r1b = 0.0;
-        eig_l1b = 0.0;
-    } else {
         popreal8(&eig_a1);
         tempb7 = eig_a1b/(4.0*(eig_r1-eig_l1)+1e-6);
         tempb8 = -(eig_a1*eig_a1*4.0*tempb7/(4.0*(eig_r1-eig_l1)+1e-6));
@@ -413,6 +413,9 @@ void jroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double
         eig_r1b = tempb9 + tempb8;
         eig_l1b = -tempb9 - tempb8;
         eig_a1b = 2*eig_a1*tempb7;
+    } else {
+        eig_r1b = 0.0;
+        eig_l1b = 0.0;
     }
     popcontrol1b(&branch);
     if (branch != 0)

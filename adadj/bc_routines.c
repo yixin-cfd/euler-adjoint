@@ -1,6 +1,6 @@
 #include "structures.h"
 
-void periodic_bc(double (*q)[4], Dim *dim, BCface face, int j, int k){
+void periodic_bc(double (*q)[4], double (*rhs)[4], Dim *dim, BCface face, int j, int k){
 
   int idx, pidx;
   int pad = dim->nghost;
@@ -21,10 +21,10 @@ void periodic_bc(double (*q)[4], Dim *dim, BCface face, int j, int k){
     pidx = j*dim->jstride + (k - dim->ktot + 2*pad)*dim->kstride;
   }
 
-  q[idx][0] = q[pidx][0];
-  q[idx][1] = q[pidx][1];
-  q[idx][2] = q[pidx][2];
-  q[idx][3] = q[pidx][3];
+  q[idx][0]   = q[pidx][0];
+  q[idx][1]   = q[pidx][1];
+  q[idx][2]   = q[pidx][2];
+  q[idx][3]   = q[pidx][3];
 
 }
 
