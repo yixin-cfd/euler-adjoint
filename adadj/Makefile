@@ -14,10 +14,10 @@ QDIFF = timestep(q dt)/(q dt) \
 
 FILES = timestep.c bc_routines.c cost.c roeflux.c
 
-# ALL : timestep_b.c  periodic_bc_b.c wall_bc_b.c jroeflux_b.c kroeflux_b.c pressure_cost_b.c\
-#       timestep_bx.c wall_bc_bx.c jroeflux_bx.c kroeflux_bx.c
+# ALL : timestep_b.c  periodic_bc_b.c wall_bc_b.c jkroeflux_b.c kroeflux_b.c pressure_cost_b.c\
+#       timestep_bx.c wall_bc_bx.c jkroeflux_bx.c kroeflux_bx.c
 ALL :  pressure_cost_b.c timestep_b.c  timestep_bx.c periodic_bc_b.c wall_bc_b.c wall_bc_bx.c \
-	jroeflux_b.c jroeflux_bx.c kroeflux_b.c kroeflux_bx.c
+	jkroeflux_b.c jkroeflux_bx.c 
 
 pressure_cost_b.c : cost.c
 	${TPN} -reverse                                   \
@@ -59,24 +59,14 @@ wall_bc_b.c : bc_routines.c
 	       -o wall_bc \
 	       bc_routines.c
 
-jroeflux_b.c : roeflux.c
+jkroeflux_b.c : roeflux.c
 	${TPN} -reverse                      \
 	       -inputlanguage  c             \
 	       -outputlanguage c             \
 	       -I              ../include    \
-	       -head           "jroeflux(q_l q_r rhs_m1 rhs)/(q_l q_r rhs_m1 rhs)" \
+	       -head           "jkroeflux(q_l q_r rhs_m1 rhs)/(q_l q_r rhs_m1 rhs)" \
 	       -adjfuncname    "_b"                     \
-	       -o jroeflux  \
-	       roeflux.c
-
-kroeflux_b.c : roeflux.c
-	${TPN} -reverse                      \
-	       -inputlanguage  c             \
-	       -outputlanguage c             \
-	       -I              ../include    \
-	       -head           "kroeflux(q_l q_r rhs_m1 rhs)/(q_l q_r rhs_m1 rhs)" \
-	       -adjfuncname    "_b"                     \
-	       -o kroeflux  \
+	       -o jkroeflux  \
 	       roeflux.c
 
 # =----------------------------------------------------------
@@ -100,24 +90,14 @@ wall_bc_bx.c : bc_routines.c
 	       -o wall_bc \
 	       bc_routines.c
 
-jroeflux_bx.c : roeflux.c
+jkroeflux_bx.c : roeflux.c
 	${TPN} -reverse                      \
 	       -inputlanguage  c             \
 	       -outputlanguage c             \
 	       -I              ../include    \
-	       -head           "jroeflux(q_l q_r rhs_m1 rhs xy1 xy2)/(q_l q_r rhs_m1 rhs xy1 xy2)" \
+	       -head           "jkroeflux(q_l q_r rhs_m1 rhs xy1 xy2)/(q_l q_r rhs_m1 rhs xy1 xy2)" \
 	       -adjfuncname    "_bx"                     \
-	       -o jroeflux  \
-	       roeflux.c
-
-kroeflux_bx.c : roeflux.c
-	${TPN} -reverse                      \
-	       -inputlanguage  c             \
-	       -outputlanguage c             \
-	       -I              ../include    \
-	       -head           "kroeflux(q_l q_r rhs_m1 rhs xy1 xy2)/(q_l q_r rhs_m1 rhs xy1 xy2)" \
-	       -adjfuncname    "_bx"                     \
-	       -o kroeflux  \
+	       -o jkroeflux  \
 	       roeflux.c
 
 

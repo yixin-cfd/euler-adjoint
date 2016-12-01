@@ -12,8 +12,9 @@
                 xy2[0:2-1]:incr
    Plus diff mem management of: q:in *q:in xy1:in xy2:in
 */
-void wall_bc_bx(double (*q)[4], double (*qb)[4], Dim *dim, double xy1[2], 
-        double xy1b[2], double xy2[2], double xy2b[2], int j, int k) {
+void wall_bc_bx(double (*q)[4], double (*qb)[4], double (*rhs)[4], Dim *dim, 
+        double xy1[2], double xy1b[2], double xy2[2], double xy2b[2], int j, 
+        int k) {
     int idx, widx, midx;
     int jstride = dim->jstride;
     int kstride = dim->kstride;
@@ -64,6 +65,10 @@ void wall_bc_bx(double (*q)[4], double (*qb)[4], Dim *dim, double xy1[2],
     tmp1 = v*q[midx][0];
     pushreal8(q[idx][2]);
     q[idx][2] = tmp1;
+    // rhs[idx][0] =  rhs[midx][0];
+    // rhs[idx][1] = -rhs[midx][1];
+    // rhs[idx][2] = -rhs[midx][2];
+    // rhs[idx][3] =  rhs[midx][3];  
     tmpb = qb[idx][3];
     qb[idx][3] = 0.0;
     tempb = 0.5*q[midx][0]*tmpb;

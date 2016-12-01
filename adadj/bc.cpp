@@ -49,7 +49,7 @@ void ADadj::boundary_conditions(bool xbar){
 
   int i, idx, j, k;
   int wall_idx = -1;
-  
+
   for(i=0; i<euler->inputs->nbc; i++){
 
     bc = euler->bc[i];
@@ -61,26 +61,26 @@ void ADadj::boundary_conditions(bool xbar){
       
       // periodic relies upon other values, pass full q pointer
       if(bc.type == PERIODIC_BC){
-	periodic_bc_b(q, qb, dim, bc.face, j, k);
-	rhsb_periodic_bc(rhsb, dim, bc.face, j, k);
+      	periodic_bc_b(q, qb, rhs, dim, bc.face, j, k);
+      	rhsb_periodic_bc(rhsb, dim, bc.face, j, k);
       }
       
       // // dirichlet: set constant
       // if(bc.type == FARFIELD_BC) farfield_bc(q[idx], euler->inputs);	
       //
-      if(bc.type == WALL_BC){
-	if(xbar)
-	  wall_bc_bx(q, qb, dim, grid->xy[idx], xyb[idx], 
-		     grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], j, k);
-	else 
-	  wall_bc_b(q, qb, dim, grid->xy[idx], grid->xy[idx+dim->jstride], j, k);
 
+      if(bc.type == WALL_BC){
+	// if(xbar)
+	//   wall_bc_bx(q, qb, dim, grid->xy[idx], xyb[idx], 
+	// 	     grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], j, k);
+	// else 
+	wall_bc_b(q, qb, rhs, dim, grid->xy[idx], grid->xy[idx+dim->jstride], j, k);
 	rhsb_wall_bc(rhsb, dim, j, k);
       }
       
     }
     }
-    
+
   }
 
 

@@ -25,10 +25,16 @@ void periodic_bc(double (*q)[4], double (*rhs)[4], Dim *dim, BCface face, int j,
   q[idx][1]   = q[pidx][1];
   q[idx][2]   = q[pidx][2];
   q[idx][3]   = q[pidx][3];
+  // rhs[idx][0]   = rhs[pidx][0];
+  // rhs[idx][1]   = rhs[pidx][1];
+  // rhs[idx][2]   = rhs[pidx][2];
+  // rhs[idx][3]   = rhs[pidx][3];
+
 
 }
 
-void wall_bc(double (*q)[4], Dim *dim, double xy1[2], double xy2[2], int j, int k){
+void wall_bc(double (*q)[4], double (*rhs)[4], Dim *dim, 
+	     double xy1[2], double xy2[2], int j, int k){
 
   int idx, widx, midx;
   int jstride = dim->jstride;
@@ -70,6 +76,11 @@ void wall_bc(double (*q)[4], Dim *dim, double xy1[2], double xy2[2], int j, int 
   q[idx][1] = u*q[midx][0];
   q[idx][2] = v*q[midx][0];
   q[idx][3] = p / (GAMMA - 1.0) + 0.5*q[midx][0]*(u*u + v*v);
+
+  // rhs[idx][0] =  rhs[midx][0];
+  // rhs[idx][1] = -rhs[midx][1];
+  // rhs[idx][2] = -rhs[midx][2];
+  // rhs[idx][3] =  rhs[midx][3];  
 
 }
 
