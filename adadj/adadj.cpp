@@ -29,6 +29,13 @@ ADadj::ADadj(Euler *e){
 
   step_number = 0;
 
+  // use the Q from the Euler class
+  memcpy(q, euler->q, dim->pts*4*sizeof(double));
+
+  // zero everything else
+  memset(rhsb, 0, 4*dim->pts*sizeof(double));
+
+
   printf("ADadj initialized\n");
 
 }

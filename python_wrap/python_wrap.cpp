@@ -50,7 +50,10 @@ BOOST_PYTHON_MODULE(libflow){
 
   class_<ADadj>("ADadj", init<Euler*>())
     .def("init", &ADadj::init)
-    .def("go",&ADadj::go)
+    .def("take_steps",&ADadj::take_steps)
+    .def("save_restart", &ADadj::save_restart)    
+    .def("read_restart", &ADadj::read_restart)
+    .def("check",&ADadj::check)
     ;
 
 }

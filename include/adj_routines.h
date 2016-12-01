@@ -28,6 +28,10 @@ extern "C" {
 		   rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
 		   xy1[2], double xy2[2], int j_or_k, int is_j);
 
+  void lift_cost_b(double q[4], double qb[4], double xy1[2], double xy2[2], Dim 
+		   *dim, double *J, double *Jb);
+
+
   //
   // XDIFF routines
   //
@@ -42,6 +46,10 @@ extern "C" {
   void jkroeflux_bx(double *q_l, double *q_lb, double *q_r, double *q_rb, double 
 		    *rhs_m1, double *rhs_m1b, double *rhs, double *rhsb, Dim *dim, double 
 		    xy1[2], double xy1b[2], double xy2[2], double xy2b[2], int j_or_k, int is_j);
+
+  void lift_cost_bx(double q[4], double qb[4], double xy1[2], double xy1b[2], 
+		    double xy2[2], double xy2b[2], Dim *dim, double *J, double *Jb);
+
 
 
 #ifdef __cplusplus

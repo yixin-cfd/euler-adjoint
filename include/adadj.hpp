@@ -39,8 +39,10 @@ public:
   ~ADadj();
   void init(boost::python::object po);
   double  step();
-  void check();
-  void go(int sn);
+  double check();
+  void read_restart(std::string n);
+  void save_restart(std::string n);
+  void take_steps(int sn);
 
 };
 

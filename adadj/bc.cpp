@@ -69,18 +69,16 @@ void ADadj::boundary_conditions(bool xbar){
       // if(bc.type == FARFIELD_BC) farfield_bc(q[idx], euler->inputs);	
       //
       if(bc.type == FARFIELD_BC){ 
-	qb[idx][0] = 0.0;
-	qb[idx][1] = 0.0;
-	qb[idx][2] = 0.0;
-	qb[idx][3] = 0.0;
+	qb[idx][0]  = 0.0; qb[idx][1]  = 0.0; qb[idx][2]  = 0.0; qb[idx][3]  = 0.0;
+	xyb[idx][0] = 0.0; xyb[idx][1] = 0.0;
       }
 
       if(bc.type == WALL_BC){
-	// if(xbar)
-	//   wall_bc_bx(q, qb, dim, grid->xy[idx], xyb[idx], 
-	// 	     grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], j, k);
-	// else 
-	wall_bc_b(q, qb, rhs, dim, grid->xy[idx], grid->xy[idx+dim->jstride], j, k);
+	if(xbar)
+	  wall_bc_bx(q, qb, rhs, dim, grid->xy[idx], xyb[idx], 
+		     grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], j, k);
+	else 
+	  wall_bc_b(q, qb, rhs, dim, grid->xy[idx], grid->xy[idx+dim->jstride], j, k);
 	rhsb_wall_bc(rhsb, dim, j, k);
       }
       

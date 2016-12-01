@@ -17,7 +17,7 @@ FILES = timestep.c bc_routines.c cost.c roeflux.c
 # ALL : timestep_b.c  periodic_bc_b.c wall_bc_b.c jkroeflux_b.c kroeflux_b.c pressure_cost_b.c\
 #       timestep_bx.c wall_bc_bx.c jkroeflux_bx.c kroeflux_bx.c
 ALL :  pressure_cost_b.c timestep_b.c  timestep_bx.c periodic_bc_b.c wall_bc_b.c wall_bc_bx.c \
-	jkroeflux_b.c jkroeflux_bx.c 
+	jkroeflux_b.c jkroeflux_bx.c lift_cost_b.c lift_cost_bx.c
 
 pressure_cost_b.c : cost.c
 	${TPN} -reverse                                   \
@@ -27,6 +27,16 @@ pressure_cost_b.c : cost.c
 	       -head           "pressure_cost(q J)/(q J)" \
 	       -adjfuncname    "_b"                       \
 	       -o pressure_cost                           \
+	       cost.c
+
+lift_cost_b.c : cost.c
+	${TPN} -reverse                                   \
+	       -inputlanguage  c                          \
+	       -outputlanguage c                          \
+	       -I              ../include                 \
+	       -head           "lift_cost(q J)/(q J)"     \
+	       -adjfuncname    "_b"                       \
+	       -o lift_cost                               \
 	       cost.c
 
 timestep_b.c : timestep.c
@@ -100,8 +110,15 @@ jkroeflux_bx.c : roeflux.c
 	       -o jkroeflux  \
 	       roeflux.c
 
-
-
+lift_cost_bx.c : cost.c
+	${TPN} -reverse                                               \
+	       -inputlanguage  c                                      \
+	       -outputlanguage c                                      \
+	       -I              ../include                             \
+	       -head           "lift_cost(q xy1 xy2 J)/(q xy1 xy2 J)" \
+	       -adjfuncname    "_bx"                                  \
+	       -o lift_cost                                           \
+	       cost.c
 
 # qdiff_routines_b.c : ${FILES}
 # 	${TPN} -reverse                      \

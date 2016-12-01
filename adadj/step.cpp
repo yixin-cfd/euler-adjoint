@@ -3,26 +3,17 @@
 #include "euler_routines.h"
 
 
-void ADadj::go(int nsteps){
+void ADadj::take_steps(int nsteps){
 
   FILE *file;
   int i, j, k, idx;
 
-  // use the Q from the Euler class
-  memcpy(q, euler->q, dim->pts*4*sizeof(double));
-
-  // zero everything else
-  memset(rhsb, 0, 4*dim->pts*sizeof(double));
   memset( qb2, 0, 4*dim->pts*sizeof(double));
-  memset(   f, 0, 4*dim->pts*sizeof(double));
-  memset(  fb, 0, 4*dim->pts*sizeof(double));
-  memset( rhs, 0, 4*dim->pts*sizeof(double));
-  memset(  dt, 0,   dim->pts*sizeof(double));
 
   //
   // Derivative of cost function J wrt J is 1!
   //
-  double dummy, residual, Jb = 1.0;
+  double dummy, liftd, residual, Jb = 1.0;
 
   //
   // Now we find derivative of cost function J wrt q
@@ -35,7 +26,8 @@ void ADadj::go(int nsteps){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
-    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
+    //pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
+    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb);
   }
 
   //
@@ -63,11 +55,12 @@ void ADadj::go(int nsteps){
   
     step_number++;
 
-    if(step_number % euler->inputs->resid == 0){
+    if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
       residual = sqrt(residual/(dim->jtot*dim->ktot));
-      printf("%4d : %15.6e\n", step_number, residual);
+      liftd    = this->check();
+      printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
       file = fopen("res_adj.dat", "a");
-      fprintf(file,"%d %E\n", step_number, residual);
+      fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
       fclose(file);
     }
 
@@ -88,7 +81,6 @@ double ADadj::step(){
   memset( dtb, 0,   dim->pts*sizeof(double));
     
   this->flux(false);
-  this->boundary_conditions(false);
 
   for(j=0; j<dim->jtot-1; j++){
   for(k=0; k<dim->ktot-1; k++){
@@ -100,6 +92,8 @@ double ADadj::step(){
 
   }
   }
+
+  this->boundary_conditions(false);
 
   // this->boundary_conditions(false);
 
@@ -146,28 +140,58 @@ double ADadj::step(){
   
 }
 
-void ADadj::check(){
+double ADadj::check(){
 
-  int j, k, idx;
+  int i, j, k, idx;
   int jstride = dim->jstride;
   int kstride = dim->kstride;
   
+  memset( qb2, 0, 4*dim->pts*sizeof(double));
+  memset(  qb, 0, 4*dim->pts*sizeof(double));
+  memset( dtb, 0,   dim->pts*sizeof(double));
   memset( xyb, 0, 2*dim->pts*sizeof(double));
 
-  this->boundary_conditions(true);
+  double (*xd)[2] = new double[dim->pts][2];
+  double dalpha   = atan(1.0)/45.0;
+
+  for(i=0; i<dim->pts; i++){
+    xd[i][0] =  dalpha*grid->xy[i][1];
+    xd[i][1] = -dalpha*grid->xy[i][0];
+  }
+
+  //
+  // Derivative of cost function J wrt J is 1!
+  //
+  double dummy, residual, Jb = 1.0;
+
+  //
+  // Now we find derivative of cost function J wrt q
+  //
+  int start, end, pj;
+  start = std::max(wall->js, dim->nghost);
+  end   = std::min(wall->je, dim->jmax + dim->nghost - 1);
+  k = dim->nghost;
+  for(j=start; j<=end; j++){
+    pj  = j-start;
+    idx = j*dim->jstride + k*dim->kstride;
+
+    // pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
+    lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
+		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb);
+  }
 
   this->flux(true);
+  this->boundary_conditions(true);
 
-  // for(j=dim->nghost; j<dim->jmax+dim->nghost; j++){
-  // for(k=dim->nghost; k<dim->kmax+dim->nghost; k++){
+  double liftd = 0.0;
+  for(i=0; i<dim->pts; i++){
 
-  //   idx = j*dim->jstride + k*dim->kstride;
+    liftd += xyb[i][0]*xd[i][0] + xyb[i][1]*xd[i][1];
 
-  //   ad_timestep_bx(q[idx], qb[idx], grid->xy[idx], xyb[idx],
-  //   		  grid->xy[idx+jstride], xyb[idx+jstride],
-  //   		  grid->xy[idx+kstride], xyb[idx+kstride],
-  //   		  euler->inputs->cfl, &dt[idx], &dtb[idx]);
-  // }
-  // }
+  }
+
+  delete xd;
+
+  return liftd;
   
 }
