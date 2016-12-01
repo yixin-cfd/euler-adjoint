@@ -68,6 +68,12 @@ void ADadj::boundary_conditions(bool xbar){
       // // dirichlet: set constant
       // if(bc.type == FARFIELD_BC) farfield_bc(q[idx], euler->inputs);	
       //
+      if(bc.type == FARFIELD_BC){ 
+	qb[idx][0] = 0.0;
+	qb[idx][1] = 0.0;
+	qb[idx][2] = 0.0;
+	qb[idx][3] = 0.0;
+      }
 
       if(bc.type == WALL_BC){
 	// if(xbar)

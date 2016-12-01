@@ -5,6 +5,7 @@
 
 void ADadj::go(int nsteps){
 
+  FILE *file;
   int i, j, k, idx;
 
   // use the Q from the Euler class
@@ -21,7 +22,7 @@ void ADadj::go(int nsteps){
   //
   // Derivative of cost function J wrt J is 1!
   //
-  double dummy, Jb = 1.0;
+  double dummy, residual, Jb = 1.0;
 
   //
   // Now we find derivative of cost function J wrt q
@@ -30,7 +31,7 @@ void ADadj::go(int nsteps){
   start = std::max(wall->js, dim->nghost);
   end   = std::min(wall->je, dim->jmax + dim->nghost - 1);
   k = dim->nghost;
-  for(j=start; j<end; j++){
+  for(j=start; j<=end; j++){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
@@ -47,21 +48,35 @@ void ADadj::go(int nsteps){
     ad_timestep(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], grid->xy[idx+dim->kstride], 
 		euler->inputs->cfl, &dt[idx]);
 
-    if(j==8 && k ==1){
-      printf("timestep is: %f\n", dt[idx]*grid->V[idx]);
-    }
   }
   }
 
+  printf("nsteps = %d\n", nsteps);
   //
   // Main iteration Loop
   //
+  file = fopen("res_adj.dat", "w");
+  fclose(file);
+    
   for(i=0; i<nsteps; i++){
-    this->step();
+    residual = this->step();
+  
+    step_number++;
+
+    if(step_number % euler->inputs->resid == 0){
+      residual = sqrt(residual/(dim->jtot*dim->ktot));
+      printf("%4d : %15.6e\n", step_number, residual);
+      file = fopen("res_adj.dat", "a");
+      fprintf(file,"%d %E\n", step_number, residual);
+      fclose(file);
+    }
+
   }
+
+
 }
 
-void ADadj::step(){
+double ADadj::step(){
   
   double residual=0.0;
   
@@ -75,8 +90,8 @@ void ADadj::step(){
   this->flux(false);
   this->boundary_conditions(false);
 
-  for(j=0; j<dim->jtot; j++){
-  for(k=0; k<dim->ktot; k++){
+  for(j=0; j<dim->jtot-1; j++){
+  for(k=0; k<dim->ktot-1; k++){
 
     idx = j*dim->jstride + k*dim->kstride;
     
@@ -86,22 +101,14 @@ void ADadj::step(){
   }
   }
 
-  for(j=0; j<dim->jtot; j++){
-  for(k=0; k<dim->ktot; k++){
-    idx = j*dim->jstride + k*dim->kstride;
-    residual += qb[idx][0]*qb[idx][0];
-    residual += qb[idx][1]*qb[idx][1];
-    residual += qb[idx][2]*qb[idx][2];
-    residual += qb[idx][3]*qb[idx][3];
-    // add contribution from cost function
-    qb[idx][0] = -qb2[idx][0] + qb[idx][0];
-    qb[idx][1] = -qb2[idx][1] + qb[idx][1];
-    qb[idx][2] = -qb2[idx][2] + qb[idx][2];
-    qb[idx][3] = -qb2[idx][3] + qb[idx][3];
-  }
-  }
+  // this->boundary_conditions(false);
 
-  this->boundary_conditions(false);
+  // j = 43; k = 66;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("__ %15.8e %15.8e %15.8e %15.8e\n",
+  // 	 rhsb[idx][0],rhsb[idx][1],rhsb[idx][2],rhsb[idx][3]);
+  // printf("__ %15.8e %15.8e %15.8e %15.8e\n",
+  // 	 qb2[idx][0],qb2[idx][1],qb2[idx][2],qb2[idx][3]);
 
   // for(j=dim->nghost; j<dim->jmax+dim->nghost; j++){
   // for(k=dim->nghost; k<dim->kmax+dim->nghost; k++){
@@ -110,23 +117,32 @@ void ADadj::step(){
 
     idx = j*dim->jstride + k*dim->kstride;
 
+    // add contribution from cost function
+    qb[idx][0] = -qb2[idx][0] + qb[idx][0];
+    qb[idx][1] = -qb2[idx][1] + qb[idx][1];
+    qb[idx][2] = -qb2[idx][2] + qb[idx][2];
+    qb[idx][3] = -qb2[idx][3] + qb[idx][3];
+
     // update the residual
     rhsb[idx][0] = rhsb[idx][0] + qb[idx][0]*dt[idx];
     rhsb[idx][1] = rhsb[idx][1] + qb[idx][1]*dt[idx];
     rhsb[idx][2] = rhsb[idx][2] + qb[idx][2]*dt[idx];
     rhsb[idx][3] = rhsb[idx][3] + qb[idx][3]*dt[idx];
-        
+
+    residual += qb[idx][0]*qb[idx][0];
+    residual += qb[idx][1]*qb[idx][1];
+    residual += qb[idx][2]*qb[idx][2];
+    residual += qb[idx][3]*qb[idx][3];
+
+    if(residual != residual){
+      printf("nan at %d %d\n", j, k);
+      throw 2341;
+    }
+
   }
   }
-  
-  this->boundary_conditions(false);
-  
-  step_number++;
-  
-  if(step_number % euler->inputs->resid == 0){
-    residual = sqrt(residual/(dim->jtot*dim->ktot));
-    printf("%4d : %15.6e\n", step_number, residual);
-  }
+
+  return residual;
   
 }
 

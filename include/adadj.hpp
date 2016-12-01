@@ -38,7 +38,7 @@ public:
   ADadj(Euler *e);
   ~ADadj();
   void init(boost::python::object po);
-  void step();
+  double  step();
   void check();
   void go(int sn);
 
