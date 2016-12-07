@@ -112,16 +112,16 @@ double ADadj::step(){
     idx = j*dim->jstride + k*dim->kstride;
 
     // add contribution from cost function
-    qb[idx][0] = -qb2[idx][0] + qb[idx][0];
-    qb[idx][1] = -qb2[idx][1] + qb[idx][1];
-    qb[idx][2] = -qb2[idx][2] + qb[idx][2];
-    qb[idx][3] = -qb2[idx][3] + qb[idx][3];
+    qb[idx][0] = qb2[idx][0] - qb[idx][0];
+    qb[idx][1] = qb2[idx][1] - qb[idx][1];
+    qb[idx][2] = qb2[idx][2] - qb[idx][2];
+    qb[idx][3] = qb2[idx][3] - qb[idx][3];
 
     // update the residual
-    rhsb[idx][0] = rhsb[idx][0] + qb[idx][0]*dt[idx];
-    rhsb[idx][1] = rhsb[idx][1] + qb[idx][1]*dt[idx];
-    rhsb[idx][2] = rhsb[idx][2] + qb[idx][2]*dt[idx];
-    rhsb[idx][3] = rhsb[idx][3] + qb[idx][3]*dt[idx];
+    rhsb[idx][0] = rhsb[idx][0] - qb[idx][0]*dt[idx];
+    rhsb[idx][1] = rhsb[idx][1] - qb[idx][1]*dt[idx];
+    rhsb[idx][2] = rhsb[idx][2] - qb[idx][2]*dt[idx];
+    rhsb[idx][3] = rhsb[idx][3] - qb[idx][3]*dt[idx];
 
     residual += qb[idx][0]*qb[idx][0];
     residual += qb[idx][1]*qb[idx][1];
@@ -155,8 +155,8 @@ double ADadj::check(){
   double dalpha   = atan(1.0)/45.0;
 
   for(i=0; i<dim->pts; i++){
-    xd[i][0] =  dalpha*grid->xy[i][1];
-    xd[i][1] = -dalpha*grid->xy[i][0];
+    xd[i][0] =  grid->xy[i][1];//*dalpha;
+    xd[i][1] = -grid->xy[i][0];//*dalpha;
   }
 
   //

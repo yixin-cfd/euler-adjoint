@@ -16,7 +16,7 @@ void MeshGen::poisson(int n){
 
   for(int i=0; i<n; i++){
 
-    //middlecoff_PQ(P, Q, x, y, dim->jtot, dim->ktot);
+    // middlecoff_PQ(P, Q, x, y, dim->jtot, dim->ktot);
     ss_PQ(P,Q,x,y,dim->jtot,dim->ktot);
 
     if((i+1)%500 == 0){

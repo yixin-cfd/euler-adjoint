@@ -23,7 +23,7 @@ void lift_cost(double q[4], double xy1[2], double xy2[2], Dim *dim, double *J){
 
   p = (GAMMA-1.0)*(q[3] - 0.5*(q[1]*q[1] + q[2]*q[2])/q[0]);
 
-  J[0] = J[0] + p*Sy;
+  J[0] = J[0] - p*Sy;
 
 
 }

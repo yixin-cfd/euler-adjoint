@@ -50,8 +50,7 @@ boost::python::object Euler::pressure(){
     // pressure
     idx1 = idx - dim->kstride;
     p1 = (GAMMA-1.0)*(q[idx ][3] - 0.5*(q[idx ][1]*q[idx][1] + q[idx ][2]*q[idx ][2])/q[idx ][0]);
-    p2 = (GAMMA-1.0)*(q[idx1][3] - 0.5*(q[idx1][1]*q[idx][1] + q[idx1][2]*q[idx1][2])/q[idx1][0]);
-    p[j-start][1] = (0.5*(p1 + p2) - inputs->p_inf)/dynp;
+    p[j-start][1] = (p1 - inputs->p_inf)/dynp;
 
   }
 
@@ -125,10 +124,7 @@ boost::python::object Euler::Cl_Cd_Cm(){
 
     // pressure
     idx1 = idx - dim->kstride;
-    p1 = (GAMMA-1.0)*(q[idx ][3] - 0.5*(q[idx ][1]*q[idx][1] + q[idx ][2]*q[idx ][2])/q[idx ][0]);
-    p2 = (GAMMA-1.0)*(q[idx1][3] - 0.5*(q[idx1][1]*q[idx][1] + q[idx1][2]*q[idx1][2])/q[idx1][0]);
-
-    p = 0.5*(p1 + p2);
+    p = (GAMMA-1.0)*(q[idx ][3] - 0.5*(q[idx ][1]*q[idx][1] + q[idx ][2]*q[idx ][2])/q[idx ][0]);
 
     fx = -p*grid->Sk[idx][0];
     fy = -p*grid->Sk[idx][1];
