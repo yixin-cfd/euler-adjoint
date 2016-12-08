@@ -15,6 +15,12 @@ void ADadj::take_steps(int nsteps){
   //
   double dummy, liftd, residual, Jb = 1.0;
 
+  double upx, upy;
+
+  // figure out which direction is "up" for lift
+  upy =  cos(euler->inputs->aoa*M_PI/180.0);
+  upx = -sin(euler->inputs->aoa*M_PI/180.0);
+
   //
   // Now we find derivative of cost function J wrt q
   //
@@ -27,7 +33,8 @@ void ADadj::take_steps(int nsteps){
     idx = j*dim->jstride + k*dim->kstride;
 
     //pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
-    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb);
+    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb,
+		upx, upy);
   }
 
   //
@@ -164,6 +171,11 @@ double ADadj::check(){
   //
   double dummy, residual, Jb = 1.0;
   double actual_lift=0.0;
+  double upx, upy;
+
+  // figure out which direction is "up" for lift
+  upy =  cos(euler->inputs->aoa*M_PI/180.0);
+  upx = -sin(euler->inputs->aoa*M_PI/180.0);
 
   //
   // Now we find derivative of cost function J wrt q
@@ -178,8 +190,8 @@ double ADadj::check(){
 
     // pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
     lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
-		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb);
-    // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_lift);
+		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
+    // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_lift, upx, upy);
 
   }
 
