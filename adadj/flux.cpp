@@ -29,10 +29,10 @@ void ADadj::flux(bool xbar){
 
       idx = j*dim->jstride + k*dim->kstride;
       jkroeflux_bx(q[idx-dim->kstride], qb[idx-dim->kstride], q[idx], qb[idx],
-		   rhs[idx-dim->kstride], rhsb[idx-dim->kstride],
-		   rhs[idx], rhsb[idx], dim,
-		   grid->xy[idx], xyb[idx],
-		   grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], k, 0);
+    		   rhs[idx-dim->kstride], rhsb[idx-dim->kstride],
+    		   rhs[idx], rhsb[idx], dim,
+    		   grid->xy[idx+dim->jstride], xyb[idx+dim->jstride],
+    		   grid->xy[idx], xyb[idx], k, 0);
     }
     }
   } else {

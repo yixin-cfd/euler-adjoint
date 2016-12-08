@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
   void pressure_cost(double q[4], Dim *dim, double *J, double p_desired);
+  void lift_cost(double q[4], double xy1[2], double xy2[2], Dim *dim, double *J);
   void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
 		   double cfl, double *dt);
 
