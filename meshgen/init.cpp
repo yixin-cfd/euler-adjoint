@@ -9,7 +9,12 @@ void MeshGen::init(double dist){
   int jtot = dim->jtot;
   int ktot = dim->ktot;
 
-  double ds = 0.5*(x[0] - x[2*jstride]);
+  double ds;
+  if(dist > 0.0 && dist < 0.1){
+    ds = dist;
+  } else {
+    ds = 0.5*(x[0] - x[2*jstride]);
+  }
 
   int idx, j, k, jle;
 
