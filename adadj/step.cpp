@@ -15,6 +15,12 @@ void ADadj::take_steps(int nsteps){
   //
   double dummy, liftd, residual, Jb = 1.0;
 
+  double upx, upy;
+
+  // figure out which direction is "up" for lift
+  upy =  cos(euler->inputs->aoa*M_PI/180.0);
+  upx = -sin(euler->inputs->aoa*M_PI/180.0);
+
   //
   // Now we find derivative of cost function J wrt q
   //
@@ -27,7 +33,8 @@ void ADadj::take_steps(int nsteps){
     idx = j*dim->jstride + k*dim->kstride;
 
     //pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
-    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb);
+    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb,
+		upx, upy);
   }
 
   //
@@ -82,16 +89,16 @@ double ADadj::step(){
     
   this->flux(false);
 
-  for(j=0; j<dim->jtot-1; j++){
-  for(k=0; k<dim->ktot-1; k++){
+  // for(j=0; j<dim->jtot-1; j++){
+  // for(k=0; k<dim->ktot-1; k++){
 
-    idx = j*dim->jstride + k*dim->kstride;
+  //   idx = j*dim->jstride + k*dim->kstride;
     
-    ad_timestep_b(q[idx], qb[idx], grid->xy[idx], grid->xy[idx+jstride], grid->xy[idx+kstride],
-    		  euler->inputs->cfl, &dt[idx], &dtb[idx]);
+  //   ad_timestep_b(q[idx], qb[idx], grid->xy[idx], grid->xy[idx+jstride], grid->xy[idx+kstride],
+  //   		  euler->inputs->cfl, &dt[idx], &dtb[idx]);
 
-  }
-  }
+  // }
+  // }
 
   this->boundary_conditions(false);
 
@@ -112,10 +119,10 @@ double ADadj::step(){
     idx = j*dim->jstride + k*dim->kstride;
 
     // add contribution from cost function
-    qb[idx][0] = qb2[idx][0] - qb[idx][0];
-    qb[idx][1] = qb2[idx][1] - qb[idx][1];
-    qb[idx][2] = qb2[idx][2] - qb[idx][2];
-    qb[idx][3] = qb2[idx][3] - qb[idx][3];
+    qb[idx][0] = qb2[idx][0] + qb[idx][0];
+    qb[idx][1] = qb2[idx][1] + qb[idx][1];
+    qb[idx][2] = qb2[idx][2] + qb[idx][2];
+    qb[idx][3] = qb2[idx][3] + qb[idx][3];
 
     // update the residual
     rhsb[idx][0] = rhsb[idx][0] - qb[idx][0]*dt[idx];
@@ -163,6 +170,12 @@ double ADadj::check(){
   // Derivative of cost function J wrt J is 1!
   //
   double dummy, residual, Jb = 1.0;
+  double actual_lift=0.0;
+  double upx, upy;
+
+  // figure out which direction is "up" for lift
+  upy =  cos(euler->inputs->aoa*M_PI/180.0);
+  upx = -sin(euler->inputs->aoa*M_PI/180.0);
 
   //
   // Now we find derivative of cost function J wrt q
@@ -177,8 +190,13 @@ double ADadj::check(){
 
     // pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
     lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
-		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb);
+		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
+    // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_lift, upx, upy);
+
   }
+
+  // printf("lift is %lf\n", actual_lift*8);
+  //printf("testing123 %e", actual_lift);
 
   this->flux(true);
   this->boundary_conditions(true);

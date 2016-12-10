@@ -225,23 +225,34 @@ void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
   f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
 
   if(j_or_k > dim->nghost){
-    rhs_m1[0] = rhs_m1[0] - f[0];
-    rhs_m1[1] = rhs_m1[1] - f[1];
-    rhs_m1[2] = rhs_m1[2] - f[2];
-    rhs_m1[3] = rhs_m1[3] - f[3];
+    rhs_m1[0] = rhs_m1[0] + f[0];
+    rhs_m1[1] = rhs_m1[1] + f[1];
+    rhs_m1[2] = rhs_m1[2] + f[2];
+    rhs_m1[3] = rhs_m1[3] + f[3];
   }
 
   if(is_j==1 && j_or_k < dim->nghost + dim->jmax){
-    rhs[0]    = rhs[0] + f[0];
-    rhs[1]    = rhs[1] + f[1];
-    rhs[2]    = rhs[2] + f[2];
-    rhs[3]    = rhs[3] + f[3];
+    rhs[0]    = rhs[0] - f[0];
+    rhs[1]    = rhs[1] - f[1];
+    rhs[2]    = rhs[2] - f[2];
+    rhs[3]    = rhs[3] - f[3];
   }
 
   if(is_j==0 && j_or_k < dim->nghost + dim->kmax){
-    rhs[0]    = rhs[0] + f[0];
-    rhs[1]    = rhs[1] + f[1];
-    rhs[2]    = rhs[2] + f[2];
-    rhs[3]    = rhs[3] + f[3];
+    rhs[0]    = rhs[0] - f[0];
+    rhs[1]    = rhs[1] - f[1];
+    rhs[2]    = rhs[2] - f[2];
+    rhs[3]    = rhs[3] - f[3];
   }
+
+  // rhs_m1[0] = rhs_m1[0] - f[0];
+  // rhs_m1[1] = rhs_m1[1] - f[1];
+  // rhs_m1[2] = rhs_m1[2] - f[2];
+  // rhs_m1[3] = rhs_m1[3] - f[3];
+
+  // rhs[0]    = rhs[0] + f[0];
+  // rhs[1]    = rhs[1] + f[1];
+  // rhs[2]    = rhs[2] + f[2];
+  // rhs[3]    = rhs[3] + f[3];
+  
 }

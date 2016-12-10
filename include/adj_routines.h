@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
   void pressure_cost(double q[4], Dim *dim, double *J, double p_desired);
+  void lift_cost(double q[4], double xy1[2], double xy2[2], Dim *dim, double *J, double ux, double uy);
   void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
 		   double cfl, double *dt);
 
@@ -29,7 +30,7 @@ extern "C" {
 		   xy1[2], double xy2[2], int j_or_k, int is_j);
 
   void lift_cost_b(double q[4], double qb[4], double xy1[2], double xy2[2], Dim 
-		   *dim, double *J, double *Jb);
+		   *dim, double *J, double *Jb, double upx, double upy);
 
 
   //
@@ -48,7 +49,8 @@ extern "C" {
 		    xy1[2], double xy1b[2], double xy2[2], double xy2b[2], int j_or_k, int is_j);
 
   void lift_cost_bx(double q[4], double qb[4], double xy1[2], double xy1b[2], 
-		    double xy2[2], double xy2b[2], Dim *dim, double *J, double *Jb);
+		    double xy2[2], double xy2b[2], Dim *dim, double *J, double *Jb,
+		    double upx, double upy);
 
 
 
