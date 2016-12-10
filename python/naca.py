@@ -178,8 +178,10 @@ def naca4(number, n, finite_TE = False, half_cosine_spacing = False):
     Z = yu[::-1] + yl[1:]
 
     # hack to force 0 for blunt trailing edges
-    Z[0] = 0.0
+    Z[0]  = 0.0
     Z[-1] = 0.0
+    Z[1]  = 0.66*Z[1]
+    Z[-2] = 0.66*Z[-2]
 
     return X,Z
 

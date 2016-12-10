@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+// tri-diagonal solver
 void tri(double *a, double *b, double *c, double *d, int n){
 
   int i;
@@ -22,6 +23,7 @@ void tri(double *a, double *b, double *c, double *d, int n){
   }
 }
 
+// periodic tri-diagonal solver
 void trip(double *a, double* b, double* c, double* f, int M){
 
   int ji;
@@ -231,8 +233,6 @@ void slor(double w, double *x1D, double *y1D, double *rhs1D, double *P1D, double
   double A1, A2, A3,x_eta,y_eta,x_xi,y_xi,J;
   double y_eta_eta, x_eta_eta, y_xi_xi, x_xi_xi;
 
-  w = 0.8;
-
   for(k=1;k<ktot-1;k++){
     // loop through x and y directions
     for(dir=0; dir<2; dir++){
@@ -245,6 +245,8 @@ void slor(double w, double *x1D, double *y1D, double *rhs1D, double *P1D, double
 	// jm1 = (j-1)%(jtot-1);
 	jp1 = (j+1 > jtot-1)? 1      : j+1;
 	jm1 = (j-1 < 0     )? jtot-2 : j-1;
+	// jp1 = j+1;
+	// jm1 = j-1;
 
 	x_xi      = (x[k][jp1]-x[k][jm1])/2.0;
 	y_xi      = (y[k][jp1]-y[k][jm1])/2.0;
@@ -289,22 +291,22 @@ void slor(double w, double *x1D, double *y1D, double *rhs1D, double *P1D, double
       // c[jtot-1] = 0;
       // d[jtot-1] = 0;
 
-      //trip(&a[1],&b[1],&c[1],&d[1],jtot-1);
+      // trip(&a[1],&b[1],&c[1],&d[1],jtot-1);
       trip(a,b,c,d,jtot-1);
       // tri(a,b,c,d,jtot);
       
       if(dir == 0){ // x-dir
-	  x[k][0] += d[0];
-	  x[k][jtot-1] = x[k][0];
-	for(j=1;j<jtot-1;j++){
+	for(j=0;j<jtot;j++){
 	  x[k][j] += d[j];
 	}
+	x[k][jtot-1] = x[k][0];
+	// x[k][0] = x[k][jtot-1];
       } else {
-	y[k][0] += d[0];
-	y[k][j-1] = y[k][0];
-	for(j=1;j<jtot-1;j++){
+	for(j=0;j<jtot-1;j++){
 	  y[k][j] += d[j];
 	}
+	y[k][jtot-1] = y[k][0];
+	// y[k][j-1] = y[k][0];
       }
     }
   }

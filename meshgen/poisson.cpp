@@ -8,7 +8,7 @@ void MeshGen::poisson(int n){
   double x_xi_xi, y_xi_xi, x_eta_eta, y_eta_eta;
   double tmpx, tmpy, res;
   int j, k;
-  double w = 1.6;
+  double w = 1.5;
   
   memset(rhs, 0, dim->pts*2*sizeof(double));
   memset(P  , 0, dim->pts*1*sizeof(double));
@@ -17,9 +17,9 @@ void MeshGen::poisson(int n){
   for(int i=0; i<n; i++){
 
     // middlecoff_PQ(P, Q, x, y, dim->jtot, dim->ktot);
-    ss_PQ(P,Q,x,y,dim->jtot,dim->ktot);
+    ss_PQ(P,Q,x,y,dim->jtot,dim->ktot,ds1,ds2);
 
-    if((i+1)%20 == 0){
+    if((i+1)%200 == 0){
       res = residual(x,y,(double*)rhs,P,Q,dim->jtot,dim->ktot);
       printf("L2 Residual %4d : %e\n", i+1, res);
     }

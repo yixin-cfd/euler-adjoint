@@ -1,6 +1,6 @@
 #include "meshgen.hpp"
 
-#define XSF 1.12
+#define XSF 1.14
 
 void MeshGen::init(double dist){
 
@@ -82,5 +82,7 @@ void MeshGen::init(double dist){
     x[j] = x[j] + 0.5;
   }
 
+  this->ds1 = x[kstride] - x[0];
+  this->ds2 = x[(ktot-1)*kstride] - x[(ktot-2)*kstride];
 
 }

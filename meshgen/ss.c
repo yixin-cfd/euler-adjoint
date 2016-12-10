@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define AAA 0.45
-#define BBB 0.45
+// make AAA and BBB smaller for less stretching near the airfoil
+#define AAA 0.35
+#define BBB 0.35
+// make CCC and DDD smaller for less stretching near the far field
 #define CCC 0.45
 #define DDD 0.45
 
 #define OMEGA 0.1
 
 void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, 
-	   int jtot, int ktot){
+	   int jtot, int ktot, double ds1, double ds2){
 
   double tmp, alpha, beta, gamma, iJ,x_xi,y_xi;
   double x_xi_xi, y_xi_xi, x_eta_eta, y_eta_eta;
@@ -37,16 +39,18 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
   
   // boundaries
   j = 0;
-  x_eta[j] = x[1][j]-x[0][j];
-  y_eta[j] = y[1][j]-y[0][j];
+  // x_eta[j] = x[1][j]-x[0][j];
+  // y_eta[j] = y[1][j]-y[0][j];
+  x_eta[j] = ds1;
+  y_eta[j] = 0;
   j = jtot-1;
-  x_eta[j] = x[1][j]-x[0][j];
-  y_eta[j] = y[1][j]-y[0][j];
+  x_eta[j] = ds2;
+  y_eta[j] = 0;
 
   // fill the rest of the eta derivatives
   k = 0;
   for(j=1;j<jtot-1;j++){
-    sn       = x[1][0]-x[0][0]; // because we forced this point along
+    sn       = ds1; // because we forced this point along
 				// the wake
     x_xi     = (x[k][j+1]-x[k][j-1])/2.0;
     y_xi     = (y[k][j+1]-y[k][j-1])/2.0;
@@ -87,15 +91,15 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
   k = ktot-1;
   // j-boundaries
   j = 0;
-  x_eta[j] = x[k][j]-x[k-1][j];
-  y_eta[j] = y[k][j]-y[k-1][j];
+  x_eta[j] = ds1;
+  y_eta[j] = 0;
   j = jtot-1;
-  x_eta[j] = x[k][j]-x[k-1][j];
-  y_eta[j] = y[k][j]-y[k-1][j];
+  x_eta[j] = ds2;
+  y_eta[j] = 0;
 
   // fill the rest of the eta derivatives
   for(j=1;j<jtot-1;j++){
-    sn       = x[k][0]-x[k-1][0]; // because we forced this point
+    sn       = ds2; // because we forced this point
 				  // along the wake
     x_xi     = (x[k][j+1]-x[k][j-1])/2.0;
     y_xi     = (y[k][j+1]-y[k][j-1])/2.0;
@@ -145,7 +149,6 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
 
   }
   }
-
 
   free(p);
   free(q);

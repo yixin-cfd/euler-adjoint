@@ -13,6 +13,7 @@ class MeshGen {
   double *a, *b, *c, *d, *P, *Q;
   double (*rhs)[2];
   Dim *dim;
+  double ds1, ds2;
   
  public:
   MeshGen(boost::python::object o, int ktot, double dist);
