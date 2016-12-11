@@ -54,6 +54,7 @@ BOOST_PYTHON_MODULE(libflow){
     .def("save_restart", &ADadj::save_restart)    
     .def("read_restart", &ADadj::read_restart)
     .def("check",&ADadj::check)
+    .def("sens_xd",&ADadj::sens_xd)
     ;
 
 }

@@ -1,7 +1,9 @@
 #include "adadj.hpp"
 #include "adj_routines.h"
 #include "euler_routines.h"
-
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL adadj_ARRAY_API
+#include <numpy/ndarrayobject.h>
 
 void ADadj::take_steps(int nsteps){
 
@@ -32,9 +34,9 @@ void ADadj::take_steps(int nsteps){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
-    //pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
-    lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb,
-		upx, upy);
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
+    // lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb,
+    // 		upx, upy);
   }
 
   //
@@ -169,8 +171,7 @@ double ADadj::check(){
   //
   // Derivative of cost function J wrt J is 1!
   //
-  double dummy, residual, Jb = 1.0;
-  double actual_lift=0.0;
+  double dummy, residual, Jb = 1.0; double actual_cost=0.0;
   double upx, upy;
 
   // figure out which direction is "up" for lift
@@ -188,15 +189,15 @@ double ADadj::check(){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
-    // pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj] );
-    lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
-		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
-    // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_lift, upx, upy);
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
+    // lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
+    // 		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
+    // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_cost, upx, upy);
 
   }
 
-  // printf("lift is %lf\n", actual_lift*8);
-  //printf("testing123 %e", actual_lift);
+  // printf("lift is %lf\n", actual_cost*8);
+  //printf("testing123 %e", actual_cost);
 
   this->flux(true);
   this->boundary_conditions(true);
@@ -212,4 +213,91 @@ double ADadj::check(){
 
   return liftd;
   
+}
+
+double ADadj::sens_xd(boost::python::object xdo){
+
+  PyArrayObject *arr = (PyArrayObject*) xdo.ptr();
+
+  int ndim, len;
+  npy_intp *dims;
+
+  ndim = PyArray_NDIM(arr);
+  dims = PyArray_DIMS(arr);
+
+  if(ndim != 3){
+    printf("ndim not 3\n");
+  }
+
+  if(dims[2] != 2){
+    printf("last dim should be 2!\n");
+  }
+
+  int xjstride = 1;
+  int xkstride = dims[1];
+
+  double (*xd)[2] = (double (*)[2])PyArray_DATA(arr);
+
+  // ------------------------------------------------------------
+  //
+  // Now tha actual adjoint calculation:
+  //
+  int i, j, k, idx, xidx;
+  int jstride = dim->jstride;
+  int kstride = dim->kstride;
+  
+  memset( qb2, 0, 4*dim->pts*sizeof(double));
+  memset(  qb, 0, 4*dim->pts*sizeof(double));
+  memset( dtb, 0,   dim->pts*sizeof(double));
+  memset( xyb, 0, 2*dim->pts*sizeof(double));
+
+  //
+  // Derivative of cost function J wrt J is 1!
+  //
+  double dummy, Jb = 1.0;
+  double upx, upy, actual_cost;
+
+  // figure out which direction is "up" for lift
+  upy =  cos(euler->inputs->aoa*M_PI/180.0);
+  upx = -sin(euler->inputs->aoa*M_PI/180.0);
+
+  //
+  // Now we find derivative of cost function J wrt q
+  //
+  int start, end, pj;
+  start = std::max(wall->js, dim->nghost);
+  end   = std::min(wall->je, dim->jmax + dim->nghost - 1);
+  k = dim->nghost;
+  for(j=start; j<=end; j++){
+    pj  = j-start;
+    idx = j*dim->jstride + k*dim->kstride;
+
+    // pressure_cost(q[idx], dim, &actual_cost, p_des[pj], euler->inputs);
+
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
+    // lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
+    // 		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
+
+  }
+
+  //printf("initial actual cost is %lf\n", actual_cost);
+  //printf("testing123 %e", actual_cost);
+
+  this->flux(true);
+  this->boundary_conditions(true);
+
+  double costd = 0.0;
+
+  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+  for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+    idx  = j*jstride + k*kstride;
+    xidx = (j-dim->nghost)*xjstride + (k-dim->nghost)*xkstride;
+
+    costd += xyb[idx][0]*xd[xidx][0] + xyb[idx][1]*xd[xidx][1];
+
+  }
+  }
+
+  return costd;
+
 }

@@ -40,6 +40,7 @@ public:
   void init(boost::python::object po);
   double  step();
   double check();
+  double sens_xd(boost::python::object xdo);
   void read_restart(std::string n);
   void save_restart(std::string n);
   void take_steps(int sn);

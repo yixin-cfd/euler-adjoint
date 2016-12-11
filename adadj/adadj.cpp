@@ -117,7 +117,7 @@ void ADadj::init(boost::python::object cp_desired_o){
 
   for(int i=0; i<len; i++){
 
-    p_des[i] = cp_tmp[i]*dynp + p_inf;
+    p_des[i] = cp_tmp[i];//*dynp + p_inf;
 
   }
   

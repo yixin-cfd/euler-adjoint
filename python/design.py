@@ -5,16 +5,21 @@ import libflow
 import grid_utils, euler_utils, hickshenne
 import yaml
 
-def solve_p(airfoil,inputs):
-    mg  = libflow.MeshGen(airfoil, inputs['ktot'], 5.0)
-    mg.poisson(500)
+def solve_euler(airfoil,inputs):
+    mg  = libflow.MeshGen(airfoil, inputs['ktot'], 0.001)
+    mg.poisson(600)
     xy  = mg.get_mesh()
     del mg
     #
     grid  = libflow.Grid(xy, 1)
     euler = libflow.Euler(grid, yaml.dump(inputs))
     euler.go()
+    return euler
+
+def solve_p(airfoil,inputs):
+    euler = solve_euler(airfoil,inputs)
     p = euler.pressure()
+    del euler
     return p
 
 def find_cost(p1, p2):
@@ -43,7 +48,8 @@ class Design:
         pressure = self.pressures[-1]
         cost     = find_cost(pressure, self.desired)
         
-        for i in range(s.shape[0]/2, s.shape[0]):
+        # for i in range(s.shape[0]/2, s.shape[0]):
+        for i in range(s.shape[0]/2, s.shape[0]/2+1):
             dvars = self.design_vars.flatten() # return flat copy of array
             dvars[i] += eps
             airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
