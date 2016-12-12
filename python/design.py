@@ -59,5 +59,26 @@ class Design:
             print "%d: (%e - %e) / %e = %e"%(i,new_cost, cost, eps, s[i])
         
         return s.reshape(self.design_vars.shape)
+
+    def second_deriv(self, eps, i):
+        s        = np.zeros(self.design_vars.size)
+        pressure = self.pressures[-1]
+        cost     = find_cost(pressure, self.desired)
         
+        dvars = self.design_vars.flatten() # return flat copy of array
+        dvars[i] += eps
+        airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
+        new_pressure = solve_p(airfoil1, self.inputs)
+        cost1        = find_cost(new_pressure, self.desired)
+
+        dvars = self.design_vars.flatten() # return flat copy of array
+        dvars[i] -= eps
+        airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
+        new_pressure = solve_p(airfoil1, self.inputs)
+        cost2        = find_cost(new_pressure, self.desired)
+
+        d2 = (cost2 - 2*cost + cost1)/(2*eps)
+        print d2
+
+        return d2
 
