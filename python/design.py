@@ -77,7 +77,7 @@ class Design:
         new_pressure = solve_p(airfoil1, self.inputs)
         cost2        = find_cost(new_pressure, self.desired)
 
-        d2 = (cost2 - 2*cost + cost1)/(2*eps)
+        d2 = (cost2 - 2*cost + cost1)/(eps*eps)
         print d2
 
         return d2
