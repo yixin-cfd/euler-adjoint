@@ -1,6 +1,61 @@
 #include "euler.hpp"
 
-void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int debug){
+// #define DO_SIMPLE
+#define EPS 0.125
+
+void simpleflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2]){
+
+  double rho_l  = q_l[0];
+  double rho_r  = q_r[0];
+  double inv_rho_l  = 1.0/rho_l;
+  double inv_rho_r  = 1.0/rho_r;
+
+  double u_l  = q_l[1]*inv_rho_l;
+  double u_r  = q_r[1]*inv_rho_r;
+
+  double v_l  = q_l[2]*inv_rho_l;
+  double v_r  = q_r[2]*inv_rho_r;
+
+  double e_l  = q_l[3];
+  double e_r  = q_r[3];
+
+  double p_l  = (GAMMA-1.0)*(e_l -  0.5*rho_l*(u_l*u_l + v_l*v_l));
+  double p_r  = (GAMMA-1.0)*(e_r -  0.5*rho_r*(u_r*u_r + v_r*v_r));
+
+  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
+  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
+
+  // face size and normals
+  double mag = sqrt(S[0]*S[0] + S[1]*S[1]);
+  double imag = 1.0/mag;
+  double r1 = S[0]*imag;
+  double r2 = S[1]*imag;
+
+  double V_l = u_l *r1 + v_l *r2;
+  double V_r = u_r *r1 + v_r *r2;
+
+  double eig_l  = std::abs(V_l) + c_l;
+  double eig_r  = std::abs(V_r) + c_r;
+
+  double rad = 0.5*(eig_l + eig_r);
+  double dF0, dF1, dF2, dF3; // delta F, blazek eqn. 4.89-4.91
+
+  dF0 = EPS * rad * (q_r[0] - q_l[0]);
+  dF1 = EPS * rad * (q_r[1] - q_l[1]);
+  dF2 = EPS * rad * (q_r[2] - q_l[2]);
+  dF3 = EPS * rad * (q_r[3] - q_l[3]);
+
+  double half_face = 0.5*mag;
+
+  f[0] = half_face*( (rho_l*V_l             ) + (rho_r*V_r             ) - dF0);
+  f[1] = half_face*( (rho_l*u_l*V_l + p_l*r1) + (rho_r*u_r*V_r + p_r*r1) - dF1);
+  f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
+  f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
+
+}
+
+
+void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2]){
 
   //
   // Computing Roe Averages
@@ -66,8 +121,6 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   double eig_r2 = V_r + c_r; 
   double eig_r3 = V_r - c_r; 
 
-
-  // Dylan: this looks like Harten's Entropy Correction but I'm not sure
   double w1, w2, lambda_tilda;
 
   lambda_tilda = std::max(4.0*(eig_r1 - eig_l1),1e-12);
@@ -85,34 +138,6 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   w1 = 1.0 - w2;
   eig_a3 = w1*(eig_a3*eig_a3/lambda_tilda + 
   	       0.25*lambda_tilda ) + w2*( std::abs(eig_a3) );
-
-  // eig_a1 = std::abs(eig_a1);
-  // eig_a2 = std::abs(eig_a2);
-  // eig_a3 = std::abs(eig_a3);
-  // lambda_tilda = std::max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
-  // if( eig_a1 < 0.5 * lambda_tilda ){
-  //   eig_a1 = eig_a1*eig_a1 / (4.0*(eig_r1 - eig_l1) + 1e-6) +0.25*(4.0*(eig_r1 - eig_l1) + 1e-6);
-  // }
-  // lambda_tilda = std::max(4.0*(eig_r2 - eig_l2) + 1e-6, 0.0);
-  // if( eig_a2 < 0.5 * lambda_tilda ){
-  //   eig_a2 = eig_a2*eig_a2 / (4.0*(eig_r2 - eig_l2) + 1e-6) +0.25*(4.0*(eig_r2 - eig_l2) + 1e-6);
-  // }
-  // lambda_tilda = std::max(4.0*(eig_r3 - eig_l3) + 1e-6, 0.0);
-  // if( eig_a3 < 0.5 * lambda_tilda ){
-  //   eig_a3 = eig_a3*eig_a3 / (4.0*(eig_r3 - eig_l3) + 1e-6) +0.25*(4.0*(eig_r3 - eig_l3) + 1e-6);
-  // }
-
-  // if(debug){
-  //   // printf("__ ul, vl, ur, vr = %15.8e %15.8e %15.8e %15.8e\n", u_l, v_l, u_r, v_r);
-  //   printf("left %15.8e %15.8e %15.8e %15.8e\n", rho_l, u_l, v_l, p_l);
-  //   printf("rght %15.8e %15.8e %15.8e %15.8e\n", rho_r, u_r, v_r, p_r);
-  //   // printf("lambdas %15.8e %15.8e %15.8e\n", eig_a1, eig_a2, eig_a3);
-  // }
-
-  if(debug){
-    printf("_-_ %15.8e %15.8e %15.8e\n", eig_a1, eig_a2, eig_a3);
-  }
-
 
   double drho = rho_r - rho_l;
   double dp   = p_r - p_l;
@@ -135,19 +160,11 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   dF2 = eig_a1 * ( (drho_dp)*v_av         + rho_av*(dv - dV*r2) );
   dF3 = eig_a1 * ( (drho_dp)*q_sqr_av*0.5 + rho_av*(u_av*du + v_av*dv - V*dV ) );
 
-  // if(debug){
-  //   printf("dF3 %15.8e\n", dF3);
-  // }
-
   // eqn. 4.91
   dF0 = dF0 + eig_a2 * dp_p_rho_c;
   dF1 = dF1 + eig_a2 * dp_p_rho_c * (u_av + c_av*r1);
   dF2 = dF2 + eig_a2 * dp_p_rho_c * (v_av + c_av*r2);
   dF3 = dF3 + eig_a2 * dp_p_rho_c * (h_av + c_av*V);
-
-  // if(debug){
-  //   printf("dF3 %15.8e\n", dF3);
-  // }
 
   // eqn 4.89
   dF0 = dF0 + eig_a3 * dp_m_rho_c;
@@ -155,20 +172,12 @@ void roeflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2], int deb
   dF2 = dF2 + eig_a3 * dp_m_rho_c * (v_av - c_av*r2);
   dF3 = dF3 + eig_a3 * dp_m_rho_c * (h_av - c_av*V);
 
-  // if(debug){
-  //   printf("dF3 %15.8e\n", dF3);
-  // }
-
   double half_face = 0.5*mag;
 
   f[0] = half_face*( (rho_l*V_l             ) + (rho_r*V_r             ) - dF0);
   f[1] = half_face*( (rho_l*u_l*V_l + p_l*r1) + (rho_r*u_r*V_r + p_r*r1) - dF1);
   f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
   f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
-
-  if(debug){
-    printf("_-_ %15.8e %15.8e %15.8e %15.8e\n", f[0], f[1], f[2], f[3]);
-  }
 
 }
 
@@ -184,26 +193,20 @@ void Euler::flux(){
   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
     idx = j*dim->jstride + k*dim->kstride;
-    roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx], (false && j==2 && k == 2));
+#ifdef DO_SIMPLE
+    simpleflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
+#else
+    roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
+#endif
+    
 
     rhs[idx-dim->jstride][0] += (f[idx-dim->jstride][0] - f[idx][0])*(j>dim->nghost);
     rhs[idx-dim->jstride][1] += (f[idx-dim->jstride][1] - f[idx][1])*(j>dim->nghost);
     rhs[idx-dim->jstride][2] += (f[idx-dim->jstride][2] - f[idx][2])*(j>dim->nghost);
     rhs[idx-dim->jstride][3] += (f[idx-dim->jstride][3] - f[idx][3])*(j>dim->nghost);
 
-    // if(j==3 && k == 3){
-    //   printf("j %d %d: %15.8e\n", j, k, rhs[idx-dim->jstride][0]);
-    // }
-
   }
   }
-
-  // j=2; k=2;
-  // idx = j*dim->jstride + k*dim->kstride;
-  // printf("rhs_ %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
-
-  // idx = (dim->nghost)*dim->jstride + 3*dim->kstride;
-  // printf("rhs %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
 
   //
   // K-direction
@@ -212,33 +215,18 @@ void Euler::flux(){
   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 
     idx = j*dim->jstride + k*dim->kstride;
-    roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx], (false && j==2 && k == 2));
+#ifdef DO_SIMPLE    
+    simpleflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
+#else    
+    roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
+#endif    
 
     rhs[idx-dim->kstride][0] += (f[idx-dim->kstride][0] - f[idx][0])*(k>dim->nghost);
     rhs[idx-dim->kstride][1] += (f[idx-dim->kstride][1] - f[idx][1])*(k>dim->nghost);
     rhs[idx-dim->kstride][2] += (f[idx-dim->kstride][2] - f[idx][2])*(k>dim->nghost);
     rhs[idx-dim->kstride][3] += (f[idx-dim->kstride][3] - f[idx][3])*(k>dim->nghost);
 
-    // if(j==2 && k == 4){
-    //   printf("k %d %d: %15.8e %15.8e %15.8e\n", j, k,rhs[idx-dim->kstride][0],f[idx][0],f[idx-dim->kstride][0]);
-    // }
-
   }
   }
-
-  // j=2; k=2;
-  // idx = j*dim->jstride + k*dim->kstride;
-  // printf("rhs_ %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
-
-
-  // idx = 190*dim->jstride + 3*dim->kstride;
-  // int idx1 = idx + dim->kstride;
-  // // printf("q   %15.8e %15.8e %15.8e %15.8e\n", q[idx][0], q[idx][1], q[idx][2], q[idx][3]);
-  // // printf("q1  %15.8e %15.8e %15.8e %15.8e\n", q[idx1][0], q[idx1][1], q[idx1][2], q[idx1][3]);
-  // // printf("fl1 %15.8e %15.8e %15.8e %15.8e\n", f[idx][0], f[idx][1], f[idx][2], f[idx][3]);
-  // printf("fl2 %15.8e %15.8e %15.8e %15.8e\n", f[idx1][0], f[idx1][1], f[idx1][2], f[idx1][3]);
-  // // printf("rhs %15.8e %15.8e %15.8e %15.8e\n", rhs[idx][0], rhs[idx][1], rhs[idx][2],rhs[idx][3]);
-  // // printf("dt %15.8e\n", dt[idx]);
-
 
 }

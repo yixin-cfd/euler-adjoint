@@ -48,8 +48,8 @@ class Design:
         pressure = self.pressures[-1]
         cost     = find_cost(pressure, self.desired)
         
-        # for i in range(s.shape[0]/2, s.shape[0]):
-        for i in range(s.shape[0]/2, s.shape[0]/2+1):
+        for i in range(s.shape[0]/2, s.shape[0]):
+        # for i in range(s.shape[0]/2, s.shape[0]/2+1):
             dvars = self.design_vars.flatten() # return flat copy of array
             dvars[i] += eps
             airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
