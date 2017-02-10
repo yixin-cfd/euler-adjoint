@@ -1,7 +1,7 @@
-#include "euler.hpp"
+#include "adjoint.hpp"
 
 
-double Adjoint::rhs_times_dt(){
+double Adjoint::arhs_times_dt(){
 
   int idx, j, k;
 

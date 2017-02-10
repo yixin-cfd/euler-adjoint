@@ -1,4 +1,4 @@
-#include "euler.hpp"
+#include "adjoint.hpp"
 #include "yaml-cpp/yaml.h"
 #define PY_ARRAY_UNIQUE_SYMBOL euler_ARRAY_API
 #include <numpy/ndarrayobject.h>
@@ -11,11 +11,10 @@ Adjoint::Adjoint(Euler *e){
   this->euler = e;
   this->dim   = e->dim;
   this->grid  = e->grid;
-  this->wall  = NULL;
-  this->p_des = NULL;
+  // this->wall  = NULL;
+  // this->p_des = NULL;
 
   q       = new double[dim->pts][4];
-
   dt      = new double[dim->pts];
   psi     = new double[dim->pts][4];
   rhs     = new double[dim->pts][4];
@@ -26,10 +25,6 @@ Adjoint::Adjoint(Euler *e){
 
   // use the Q from the Euler class
   memcpy(q, euler->q, dim->pts*4*sizeof(double));
-
-  // zero everything else
-  memset(rhsb, 0, 4*dim->pts*sizeof(double));
-
 
   printf("ADadj initialized\n");
   
@@ -43,10 +38,7 @@ void Adjoint::say_hello(){
 
 Adjoint::~Adjoint(){
 
-  if(inputs) delete inputs;
-  if(bc)     delete bc;
-
-  delete f;
+  delete psi;
   delete q;
   delete scratch;
   delete rhs;

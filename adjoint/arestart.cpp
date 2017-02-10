@@ -1,7 +1,7 @@
-#include "euler.hpp"
+#include "adjoint.hpp"
 
 
-void Euler::save_restart(std::string fname){
+void Adjoint::save_restart(std::string fname){
 
   int i, pts;
   FILE *fid;

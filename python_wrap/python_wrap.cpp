@@ -10,6 +10,7 @@
 #include "slow_euler.hpp"
 #include "meshgen.hpp"
 #include "adadj.hpp"
+#include "adjoint.hpp"
 
 BOOST_PYTHON_MODULE(libflow){
 
@@ -55,6 +56,10 @@ BOOST_PYTHON_MODULE(libflow){
     .def("read_restart", &ADadj::read_restart)
     .def("check",&ADadj::check)
     .def("sens_xd",&ADadj::sens_xd)
+    ;
+
+  class_<Adjoint>("Adjoint", init<Euler*>())
+    .def("say_hello",&Adjoint::say_hello)
     ;
 
 }

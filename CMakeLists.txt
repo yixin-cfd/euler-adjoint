@@ -129,11 +129,31 @@ target_compile_definitions(adadj PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(adadj PUBLIC ${INCLUDE_DIRS})
 target_link_libraries(adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
+#
+# Library: Adjoint
+#
+file(GLOB adjoint_sources "${2DFLOW_SOURCE_DIR}/adjoint/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+
+add_library(adjoint SHARED ${adjoint_sources})
+
+set_property( TARGET adjoint APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+
+set_target_properties(adjoint PROPERTIES
+  ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
+  )
+
+list(APPEND INCLUDE_DIRS "$ENV{TAPENADE_HOME}/include")
+
+target_compile_definitions(adjoint PRIVATE ${DEBUG_DEFINITION})
+target_include_directories(adjoint PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(adjoint ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+
 
 #
 # Python Module for all libs
 #
-file(GLOB flow_sources   "${2DFLOW_SOURCE_DIR}/python_wrap/*.cpp" )
+file(GLOB flow_sources "${2DFLOW_SOURCE_DIR}/python_wrap/*.cpp" )
 
 message(STATUS ${flow_sources})
 
@@ -145,6 +165,6 @@ set_target_properties(flow PROPERTIES
   )
 target_compile_definitions(flow PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(flow PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(flow euler grid meshgen adadj slow_euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(flow euler grid meshgen adadj adjoint slow_euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #target_link_libraries(flow ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 

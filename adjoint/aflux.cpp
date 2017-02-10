@@ -1,4 +1,4 @@
-#include "euler.hpp"
+#include "adjoint.hpp"
 
 // #define DO_SIMPLE
 #define EPS 0.125
@@ -56,50 +56,50 @@ void flux(double* q_l, double* q_r, double* f, Dim *dim, double S[2]){
 
 
 void Adjoint::aflux(){
-  
+
   int j, k, idx, stride;
 
-  //
-  // J-direction
-  //
-  for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
-  for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+//   //
+//   // J-direction
+//   //
+//   for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
+//   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
-    idx = j*dim->jstride + k*dim->kstride;
-#ifdef DO_SIMPLE
-    simpleflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
-#else
-    roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
-#endif
+//     idx = j*dim->jstride + k*dim->kstride;
+// #ifdef DO_SIMPLE
+//     simpleflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
+// #else
+//     roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
+// #endif
     
 
-    rhs[idx-dim->jstride][0] += (f[idx-dim->jstride][0] - f[idx][0])*(j>dim->nghost);
-    rhs[idx-dim->jstride][1] += (f[idx-dim->jstride][1] - f[idx][1])*(j>dim->nghost);
-    rhs[idx-dim->jstride][2] += (f[idx-dim->jstride][2] - f[idx][2])*(j>dim->nghost);
-    rhs[idx-dim->jstride][3] += (f[idx-dim->jstride][3] - f[idx][3])*(j>dim->nghost);
+//     rhs[idx-dim->jstride][0] += (f[idx-dim->jstride][0] - f[idx][0])*(j>dim->nghost);
+//     rhs[idx-dim->jstride][1] += (f[idx-dim->jstride][1] - f[idx][1])*(j>dim->nghost);
+//     rhs[idx-dim->jstride][2] += (f[idx-dim->jstride][2] - f[idx][2])*(j>dim->nghost);
+//     rhs[idx-dim->jstride][3] += (f[idx-dim->jstride][3] - f[idx][3])*(j>dim->nghost);
 
-  }
-  }
+//   }
+//   }
 
-  //
-  // K-direction
-  //
-  for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
-  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+//   //
+//   // K-direction
+//   //
+//   for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
+//   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 
-    idx = j*dim->jstride + k*dim->kstride;
-#ifdef DO_SIMPLE    
-    simpleflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
-#else    
-    roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
-#endif    
+//     idx = j*dim->jstride + k*dim->kstride;
+// #ifdef DO_SIMPLE    
+//     simpleflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
+// #else    
+//     roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
+// #endif    
 
-    rhs[idx-dim->kstride][0] += (f[idx-dim->kstride][0] - f[idx][0])*(k>dim->nghost);
-    rhs[idx-dim->kstride][1] += (f[idx-dim->kstride][1] - f[idx][1])*(k>dim->nghost);
-    rhs[idx-dim->kstride][2] += (f[idx-dim->kstride][2] - f[idx][2])*(k>dim->nghost);
-    rhs[idx-dim->kstride][3] += (f[idx-dim->kstride][3] - f[idx][3])*(k>dim->nghost);
+//     rhs[idx-dim->kstride][0] += (f[idx-dim->kstride][0] - f[idx][0])*(k>dim->nghost);
+//     rhs[idx-dim->kstride][1] += (f[idx-dim->kstride][1] - f[idx][1])*(k>dim->nghost);
+//     rhs[idx-dim->kstride][2] += (f[idx-dim->kstride][2] - f[idx][2])*(k>dim->nghost);
+//     rhs[idx-dim->kstride][3] += (f[idx-dim->kstride][3] - f[idx][3])*(k>dim->nghost);
 
-  }
-  }
+//   }
+//   }
 
 }
