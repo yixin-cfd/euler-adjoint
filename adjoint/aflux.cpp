@@ -3,103 +3,110 @@
 // #define DO_SIMPLE
 #define EPS 0.125
 
-void flux(double* q_l, double* q_r, double* f, Dim *dim, double S[2]){
+void adj_flux(double* q_l, double* q_r, double* psi_l, double* psi_r, double* f, 
+	      Dim *dim, double S[2], double A[4][4]){
 
-  double rho_l  = q_l[0];
-  double rho_r  = q_r[0];
-  double inv_rho_l  = 1.0/rho_l;
-  double inv_rho_r  = 1.0/rho_r;
+  double Sx, Sy, phi, u, v, V, E;
+  double a1;
+  double a2 = GAMMA-1;
+  double a3 = GAMMA-2;
+  double dpsi0, dpsi1, dpsi2, dpsi3;
+  double diss0, diss1, diss2, diss3;
+  double spec, c; // spectral radius, 
 
-  double u_l  = q_l[1]*inv_rho_l;
-  double u_r  = q_r[1]*inv_rho_r;
+  Sx         = S[0];
+  Sy         = S[1];
+  u          = 0.5*(q_l[1]/q_l[0] + q_r[1]/q_r[0]);
+  v          = 0.5*(q_l[2]/q_l[0] + q_r[2]/q_r[0]);
+  E          = 0.5*(q_l[3]/q_l[0] + q_r[3]/q_r[0]);
+  
+  V          = Sx*u + Sy*v;
+  c          = sqrt( a2*GAMMA*(E - 0.5*(u*u + v*v)) * (Sx*Sx + Sy*Sy) );
+  phi        = 0.5*a2*(u*u + v*v);
+  a1         = GAMMA*E - phi;
+  spec       = std::abs(V)+c;
 
-  double v_l  = q_l[2]*inv_rho_l;
-  double v_r  = q_r[2]*inv_rho_r;
+  // build the Jacobian
+  A[0][0]    = 0.0;
+  A[0][1]    = Sx;
+  A[0][2]    = Sy;
+  A[0][3]    = 0.0;
+  A[1][0]    = Sx*phi - u*V;
+  A[1][1]    = V-a3*Sx*u;
+  A[1][2]    = Sy*u-a2*Sx*v;
+  A[1][3]    = a2*Sx;
+  A[2][0]    = Sy*phi-v*V;
+  A[2][1]    = Sx*v-a2*Sy*u;
+  A[2][2]    = V-a3*Sy*v;
+  A[2][3]    = a2*Sy;
+  A[3][0]    = V*(phi-a1);
+  A[3][1]    = Sx*a1-a2*u*V;
+  A[3][2]    = Sy*a1-a2*v*V;
+  A[3][3]    = GAMMA*V;
+	       
+  dpsi0      = psi_r[0] - psi_l[0];
+  dpsi1      = psi_r[1] - psi_l[1];
+  dpsi2      = psi_r[2] - psi_l[2];
+  dpsi3      = psi_r[3] - psi_l[3];
 
-  double e_l  = q_l[3];
-  double e_r  = q_r[3];
+  diss0      = EPS*spec*dpsi0;
+  diss1      = EPS*spec*dpsi1;
+  diss2      = EPS*spec*dpsi2;
+  diss3      = EPS*spec*dpsi3;
 
-  double p_l  = (GAMMA-1.0)*(e_l -  0.5*rho_l*(u_l*u_l + v_l*v_l));
-  double p_r  = (GAMMA-1.0)*(e_r -  0.5*rho_r*(u_r*u_r + v_r*v_r));
-
-  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
-  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
-
-  // face size and normals
-  double mag = sqrt(S[0]*S[0] + S[1]*S[1]);
-  double imag = 1.0/mag;
-  double r1 = S[0]*imag;
-  double r2 = S[1]*imag;
-
-  double V_l = u_l *r1 + v_l *r2;
-  double V_r = u_r *r1 + v_r *r2;
-
-  double eig_l  = std::abs(V_l) + c_l;
-  double eig_r  = std::abs(V_r) + c_r;
-
-  double rad = 0.5*(eig_l + eig_r);
-  double dF0, dF1, dF2, dF3; // delta F, blazek eqn. 4.89-4.91
-
-  dF0 = EPS * rad * (q_r[0] - q_l[0]);
-  dF1 = EPS * rad * (q_r[1] - q_l[1]);
-  dF2 = EPS * rad * (q_r[2] - q_l[2]);
-  dF3 = EPS * rad * (q_r[3] - q_l[3]);
-
-  double half_face = 0.5*mag;
-
-  f[0] = half_face*( (rho_l*V_l             ) + (rho_r*V_r             ) - dF0);
-  f[1] = half_face*( (rho_l*u_l*V_l + p_l*r1) + (rho_r*u_r*V_r + p_r*r1) - dF1);
-  f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
-  f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
+  // We want  [ A^T ]*[dpsi] - dissipation
+  f[0]  = A[0][0]*dpsi0 + A[1][0]*dpsi1 + A[2][0]*dpsi2 + A[3][0]*dpsi3 - diss0;
+  f[1]  = A[0][1]*dpsi0 + A[1][1]*dpsi1 + A[2][1]*dpsi2 + A[3][1]*dpsi3 - diss1;
+  f[2]  = A[0][2]*dpsi0 + A[1][2]*dpsi1 + A[2][2]*dpsi2 + A[3][2]*dpsi3 - diss2;
+  f[3]  = A[0][3]*dpsi0 + A[1][3]*dpsi1 + A[2][3]*dpsi2 + A[3][3]*dpsi3 - diss3;
 
 }
 
 
 void Adjoint::aflux(){
 
-  int j, k, idx, stride;
+  int j, k, idx, idx1;
 
-//   //
-//   // J-direction
-//   //
-//   for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
-//   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+  double (*f)[4] = (double (*)[4])this->scratch;
 
-//     idx = j*dim->jstride + k*dim->kstride;
-// #ifdef DO_SIMPLE
-//     simpleflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
-// #else
-//     roeflux(q[idx-dim->jstride], q[idx], f[idx], dim, grid->Sj[idx]);
-// #endif
-    
+  double A[4][4];
 
-//     rhs[idx-dim->jstride][0] += (f[idx-dim->jstride][0] - f[idx][0])*(j>dim->nghost);
-//     rhs[idx-dim->jstride][1] += (f[idx-dim->jstride][1] - f[idx][1])*(j>dim->nghost);
-//     rhs[idx-dim->jstride][2] += (f[idx-dim->jstride][2] - f[idx][2])*(j>dim->nghost);
-//     rhs[idx-dim->jstride][3] += (f[idx-dim->jstride][3] - f[idx][3])*(j>dim->nghost);
+  //
+  // J-Direction
+  //
+  for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
+  for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
-//   }
-//   }
+    idx = j*dim->jstride + k*dim->kstride;
+    idx1       = idx-dim->jstride;
 
-//   //
-//   // K-direction
-//   //
-//   for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
-//   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+    adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f[idx], dim, grid->Sj[idx], A);
 
-//     idx = j*dim->jstride + k*dim->kstride;
-// #ifdef DO_SIMPLE    
-//     simpleflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
-// #else    
-//     roeflux(q[idx-dim->kstride], q[idx], f[idx], dim, grid->Sk[idx]);
-// #endif    
+    rhs[idx1][0] += (f[idx1][0] - f[idx][0])*(j>dim->nghost);
+    rhs[idx1][1] += (f[idx1][1] - f[idx][1])*(j>dim->nghost);
+    rhs[idx1][2] += (f[idx1][2] - f[idx][2])*(j>dim->nghost);
+    rhs[idx1][3] += (f[idx1][3] - f[idx][3])*(j>dim->nghost);
 
-//     rhs[idx-dim->kstride][0] += (f[idx-dim->kstride][0] - f[idx][0])*(k>dim->nghost);
-//     rhs[idx-dim->kstride][1] += (f[idx-dim->kstride][1] - f[idx][1])*(k>dim->nghost);
-//     rhs[idx-dim->kstride][2] += (f[idx-dim->kstride][2] - f[idx][2])*(k>dim->nghost);
-//     rhs[idx-dim->kstride][3] += (f[idx-dim->kstride][3] - f[idx][3])*(k>dim->nghost);
+  }
+  }
 
-//   }
-//   }
+  //
+  // K-direction
+  //
+  for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
+  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+
+    idx = j*dim->jstride + k*dim->kstride;
+    idx1       = idx-dim->kstride;
+
+    adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f[idx], dim, grid->Sk[idx], A);
+
+    rhs[idx1][0] += (f[idx1][0] - f[idx][0])*(k>dim->nghost);
+    rhs[idx1][1] += (f[idx1][1] - f[idx][1])*(k>dim->nghost);
+    rhs[idx1][2] += (f[idx1][2] - f[idx][2])*(k>dim->nghost);
+    rhs[idx1][3] += (f[idx1][3] - f[idx][3])*(k>dim->nghost);
+
+  }
+  }
 
 }
