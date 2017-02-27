@@ -11,7 +11,7 @@ Adjoint::Adjoint(Euler *e){
   this->euler = e;
   this->dim   = e->dim;
   this->grid  = e->grid;
-  // this->wall  = NULL;
+  this->wall  = NULL;
   // this->p_des = NULL;
 
   q       = new double[dim->pts][4];
