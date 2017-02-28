@@ -1,8 +1,8 @@
 #include "structures.h"
 
-#define EPS 1.0e-3
+#define EPS 0.25
 
-void aajkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
+void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
 	       double xy1[2], double xy2[2], int j_or_k, int is_j){
 
   double f[4];
@@ -11,20 +11,16 @@ void aajkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim
   S[0] =   xy2[1] - xy1[1];
   S[1] = - xy2[0] + xy1[0];
 
-  //
-  // Computing Roe Averages
-  //
   double rho_l  = q_l[0];
-  double inv_rho_l  = 1.0/rho_l;
-  double u_l  = q_l[1]*inv_rho_l;
-  double v_l  = q_l[2]*inv_rho_l;
-  double V_l  = u_l *S[0] + v_l *S[1];
-
   double rho_r  = q_r[0];
+  double inv_rho_l  = 1.0/rho_l;
   double inv_rho_r  = 1.0/rho_r;
+
+  double u_l  = q_l[1]*inv_rho_l;
   double u_r  = q_r[1]*inv_rho_r;
+
+  double v_l  = q_l[2]*inv_rho_l;
   double v_r  = q_r[2]*inv_rho_r;
-  double V_r  = u_r *S[0] + v_r *S[1];
 
   double e_l  = q_l[3];
   double e_r  = q_r[3];
@@ -32,52 +28,67 @@ void aajkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim
   double p_l  = (GAMMA-1.0)*(e_l -  0.5*rho_l*(u_l*u_l + v_l*v_l));
   double p_r  = (GAMMA-1.0)*(e_r -  0.5*rho_r*(u_r*u_r + v_r*v_r));
 
-  // need vn grid here for lambdas below
+  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
+  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
 
-  f[0] = 0.5*( (q_l[0]*V_l           ) + (q_r[0]*V_r           ) );
-  f[1] = 0.5*( (q_l[1]*V_l + p_l*S[0]) + (q_r[1]*V_r + p_r*S[0]) );
-  f[2] = 0.5*( (q_l[2]*V_l + p_l*S[1]) + (q_r[2]*V_r + p_r*S[1]) );
-  f[3] = 0.5*( (e_l+p_l)*V_l           + (e_r+p_r)*V_r           );
+  // face size and normals
+  double mag = sqrt(S[0]*S[0] + S[1]*S[1]);
+  double imag = 1.0/mag;
+  double r1 = S[0]*imag;
+  double r2 = S[1]*imag;
 
-  f[0] = f[0] + EPS*(q_r[0]-q_l[0]);
-  f[1] = f[1] + EPS*(q_r[1]-q_l[1]);
-  f[2] = f[2] + EPS*(q_r[2]-q_l[2]);
-  f[3] = f[3] + EPS*(q_r[3]-q_l[3]);
+  double V_l = u_l *r1 + v_l *r2;
+  double V_r = u_r *r1 + v_r *r2;
+
+  double eig_l, eig_r;
+  if(V_l > 0.0) 
+    eig_l =  V_l + c_l;
+  else
+    eig_l = -V_l + c_l;
+  if(V_r > 0.0) 
+    eig_r =  V_r + c_r;
+  else
+    eig_r = -V_r + c_r;
+
+  double rad = 0.5*(eig_l + eig_r);
+  double dF0, dF1, dF2, dF3; // delta F, blazek eqn. 4.89-4.91
+
+  dF0 = EPS * rad * (q_r[0] - q_l[0]);
+  dF1 = EPS * rad * (q_r[1] - q_l[1]);
+  dF2 = EPS * rad * (q_r[2] - q_l[2]);
+  dF3 = EPS * rad * (q_r[3] - q_l[3]);
+
+  double half_face = 0.5*mag;
+
+  f[0] = half_face*( (rho_l*V_l             ) + (rho_r*V_r             ) - dF0);
+  f[1] = half_face*( (rho_l*u_l*V_l + p_l*r1) + (rho_r*u_r*V_r + p_r*r1) - dF1);
+  f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
+  f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
 
   if(j_or_k > dim->nghost){
-    rhs_m1[0] = rhs_m1[0] - f[0];
-    rhs_m1[1] = rhs_m1[1] - f[1];
-    rhs_m1[2] = rhs_m1[2] - f[2];
-    rhs_m1[3] = rhs_m1[3] - f[3];
+    rhs_m1[0] = rhs_m1[0] + f[0];
+    rhs_m1[1] = rhs_m1[1] + f[1];
+    rhs_m1[2] = rhs_m1[2] + f[2];
+    rhs_m1[3] = rhs_m1[3] + f[3];
   }
 
   if(is_j==1 && j_or_k < dim->nghost + dim->jmax){
-    rhs[0]    = rhs[0] + f[0];
-    rhs[1]    = rhs[1] + f[1];
-    rhs[2]    = rhs[2] + f[2];
-    rhs[3]    = rhs[3] + f[3];
+    rhs[0]    = rhs[0] - f[0];
+    rhs[1]    = rhs[1] - f[1];
+    rhs[2]    = rhs[2] - f[2];
+    rhs[3]    = rhs[3] - f[3];
   }
 
   if(is_j==0 && j_or_k < dim->nghost + dim->kmax){
-    rhs[0]    = rhs[0] + f[0];
-    rhs[1]    = rhs[1] + f[1];
-    rhs[2]    = rhs[2] + f[2];
-    rhs[3]    = rhs[3] + f[3];
+    rhs[0]    = rhs[0] - f[0];
+    rhs[1]    = rhs[1] - f[1];
+    rhs[2]    = rhs[2] - f[2];
+    rhs[3]    = rhs[3] - f[3];
   }
-  // rhs_m1[0] = rhs_m1[0] - f[0];
-  // rhs_m1[1] = rhs_m1[1] - f[1];
-  // rhs_m1[2] = rhs_m1[2] - f[2];
-  // rhs_m1[3] = rhs_m1[3] - f[3];
-
-  // rhs[0]    = rhs[0] + f[0];
-  // rhs[1]    = rhs[1] + f[1];
-  // rhs[2]    = rhs[2] + f[2];
-  // rhs[3]    = rhs[3] + f[3];
 
 }
 
-
-void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
+void aajkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
 	       double xy1[2], double xy2[2], int j_or_k, int is_j){
 
   double f[4];
@@ -149,7 +160,6 @@ void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
   double eig_r1 = V_r; 
   double eig_r2 = V_r + c_r; 
   double eig_r3 = V_r - c_r; 
-
 
   // Dylan: this looks like Harten's Entropy Correction but I'm not sure
   double lambda_tilda;

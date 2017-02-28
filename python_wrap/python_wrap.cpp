@@ -59,6 +59,8 @@ BOOST_PYTHON_MODULE(libflow){
     ;
 
   class_<Adjoint>("Adjoint", init<Euler*>())
+    .def("init", &Adjoint::init)
+    .def("take_steps",&Adjoint::take_steps)
     .def("say_hello",&Adjoint::say_hello)
     ;
 

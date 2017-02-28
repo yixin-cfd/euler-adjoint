@@ -14,23 +14,28 @@ class Adjoint {
   Dim *dim;
   Grid *grid;
   BC* wall;
+
+  double *scratch, *dt;
+  double *p_des;
   
-  void init();
   // void timestep();
   void boundary_conditions();
   void aflux();
   void adiss();
   double arhs_times_dt();
   void update_psi();
+  void timestep();
+  void cost(double (*r)[4]);
 
  public:
   Adjoint(Euler *e);
   ~Adjoint();
+  void init(boost::python::object po);
   void say_hello();
   void write_solution(std::string name);
   void take_steps(int n);
   void go();
-  void step();
+  double step();
   void save_restart(std::string fname);
   void read_restart(std::string fname);
   // int write_to_file(std::string s);
@@ -44,7 +49,7 @@ class Adjoint {
   double (*psi)[4];
   double (*q)[4];
   double (*rhs)[4];
-  double *scratch, *dt;
+  double (*rhs0)[4];
 
 };
 

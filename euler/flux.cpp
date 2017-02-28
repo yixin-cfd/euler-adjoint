@@ -1,7 +1,7 @@
 #include "euler.hpp"
 
-// #define DO_SIMPLE
-#define EPS 0.125
+#define DO_SIMPLE
+#define EPS 0.25
 
 void simpleflux(double* q_l, double* q_r, double* f, Dim *dim, double S[2]){
 

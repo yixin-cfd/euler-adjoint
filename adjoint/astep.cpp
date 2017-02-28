@@ -1,9 +1,18 @@
 #include "adjoint.hpp"
 
 void Adjoint::take_steps(int n){
+
+  double residual;
+
+  cost(rhs0);
+
+  timestep();
+
   for(int i=0; i<n; i++){
-    step();
+    residual = step();
     step_number++;
+
+    printf("Residual is %25.16e\n", residual);
   }
 }
 
@@ -11,10 +20,45 @@ void Adjoint:: go(){
   this->take_steps(euler->inputs->steps);
 }
 
-void Adjoint::step(){
+double Adjoint::step(){
 
   // FILE *f;
-  // double residual;
+  int j, k, idx;
+  double residual = 0.0;
+
+  this->aflux();
+  this->boundary_conditions();
+
+  for(j=0; j<dim->jtot; j++){
+  for(k=0; k<dim->ktot; k++){
+
+    idx = j*dim->jstride + k*dim->kstride;
+
+    // add contribution from cost function
+    rhs[idx][0] = rhs0[idx][0] + rhs[idx][0];
+    rhs[idx][1] = rhs0[idx][1] + rhs[idx][1];
+    rhs[idx][2] = rhs0[idx][2] + rhs[idx][2];
+    rhs[idx][3] = rhs0[idx][3] + rhs[idx][3];
+
+    psi[idx][0] = psi[idx][0] - rhs[idx][0] * dt[idx];
+    psi[idx][1] = psi[idx][1] - rhs[idx][1] * dt[idx];
+    psi[idx][2] = psi[idx][2] - rhs[idx][2] * dt[idx];
+    psi[idx][3] = psi[idx][3] - rhs[idx][3] * dt[idx];
+
+    residual += rhs[idx][0]*rhs[idx][0];
+    residual += rhs[idx][1]*rhs[idx][1];
+    residual += rhs[idx][2]*rhs[idx][2];
+    residual += rhs[idx][3]*rhs[idx][3];
+
+    if(residual != residual){
+      printf("nan at %d %d\n", j, k);
+      throw 2341;
+    }
+
+  }
+  }
+
+  return residual;
 
   // memset(rhs, 0, dim->pts*4*sizeof(double));
 
