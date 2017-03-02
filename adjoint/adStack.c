@@ -1,0 +1,1 @@
+../adadj/adStack.c

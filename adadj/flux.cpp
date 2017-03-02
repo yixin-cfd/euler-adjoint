@@ -49,6 +49,12 @@ void ADadj::flux(bool xbar){
 		    rhs[idx], rhsb[idx], dim,
 		    grid->xy[idx], grid->xy[idx+dim->kstride], j, 1);
 
+	// if(j == 5 && k == 1){
+	//   printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+	// 	 qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
+	// }
+
+
     }
     }
 
@@ -60,10 +66,23 @@ void ADadj::flux(bool xbar){
 
     	idx = j*dim->jstride + k*dim->kstride;
 
+	// if(j == 1 && k == 1){
+	// }
+
+
     	jkroeflux_b(q[idx-dim->kstride], qb[idx-dim->kstride], q[idx], qb[idx],
     		   rhs[idx-dim->kstride], rhsb[idx-dim->kstride],
     		   rhs[idx], rhsb[idx], dim,
     		   grid->xy[idx+dim->jstride], grid->xy[idx], k, 0);
+
+	// if(j == 5 && k == 1){
+	//   // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+	//   // 	 qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
+	//   printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+	// 	 rhsb[idx][0], rhsb[idx][1], rhsb[idx][2], rhsb[idx][3]);
+	// }
+
+
 
     }
     }

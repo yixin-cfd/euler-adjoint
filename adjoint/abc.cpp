@@ -79,7 +79,7 @@ void wall_bc(BC bc, double (*psi)[4], double (*q)[4], double (*rhs)[4],
     Sx   = S[widx][0];
     Sy   = S[widx][1];
 
-    imag = 1.0 / (Sx*Sx + Sy*Sy);
+    imag = 1.0 / sqrt(Sx*Sx + Sy*Sy);
 
     Sx  *= imag;
     Sy  *= imag;
@@ -99,6 +99,21 @@ void wall_bc(BC bc, double (*psi)[4], double (*q)[4], double (*rhs)[4],
     rhs[idx][0] = 0.0;
     rhs[midx][0] = rhs[midx][0] + tmpb2;
 
+    // tmpb = rhs[idx][3];
+    // rhs[idx][3] = 0.0;
+    // rhs[midx][3] = rhs[midx][3] + tmpb;
+    // tmpb0 = rhs[idx][2];
+    // rhs[idx][2] = 0.0;
+    // rhs[midx][2] = rhs[midx][2] + (1.0-Sy*Sy*2.0)*tmpb0;
+    // rhs[midx][1] = rhs[midx][1] - Sx*2.0*Sy*tmpb0;
+    // tmpb1 = rhs[idx][1];
+    // rhs[idx][1] = 0.0;
+    // rhs[midx][1] = rhs[midx][1] + (1.0-Sx*Sx*2.0)*tmpb1;
+    // rhs[midx][2] = rhs[midx][2] - Sx*2.0*Sy*tmpb1;
+    // tmpb2 = rhs[idx][0];
+    // rhs[idx][0] = 0.0;
+    // rhs[midx][0] = rhs[midx][0] + tmpb2;
+
     // extrapolate in k-direction beyond wall
     psi[idx][0] = 2*psi[idx+up][0] - psi[idx+up+up][0];
     psi[idx][1] = 2*psi[idx+up][1] - psi[idx+up+up][1];
@@ -111,6 +126,14 @@ void wall_bc(BC bc, double (*psi)[4], double (*q)[4], double (*rhs)[4],
 
 
 void Adjoint::boundary_conditions(){
+
+  int j, k, idx;
+
+  // j = 5; k = 0;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	 rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
+
 
   for(int i=0; i<euler->inputs->nbc; i++){
 
@@ -145,5 +168,9 @@ void Adjoint::boundary_conditions(){
     
   }
 
+  // j = 5; k = 1;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	 rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
 
 }

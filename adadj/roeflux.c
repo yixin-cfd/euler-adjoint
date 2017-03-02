@@ -1,4 +1,7 @@
 #include "structures.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #define EPS 0.25
 
@@ -28,8 +31,6 @@ void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
   double p_l  = (GAMMA-1.0)*(e_l -  0.5*rho_l*(u_l*u_l + v_l*v_l));
   double p_r  = (GAMMA-1.0)*(e_r -  0.5*rho_r*(u_r*u_r + v_r*v_r));
 
-  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
-  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
 
   // face size and normals
   double mag = sqrt(S[0]*S[0] + S[1]*S[1]);
@@ -40,18 +41,15 @@ void jkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim,
   double V_l = u_l *r1 + v_l *r2;
   double V_r = u_r *r1 + v_r *r2;
 
+  double dF0, dF1, dF2, dF3;
+
+  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
+  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
   double eig_l, eig_r;
-  if(V_l > 0.0) 
-    eig_l =  V_l + c_l;
-  else
-    eig_l = -V_l + c_l;
-  if(V_r > 0.0) 
-    eig_r =  V_r + c_r;
-  else
-    eig_r = -V_r + c_r;
+  eig_l =  sqrt(V_l*V_l) + c_l;
+  eig_r =  sqrt(V_r*V_r) + c_r;
 
   double rad = 0.5*(eig_l + eig_r);
-  double dF0, dF1, dF2, dF3; // delta F, blazek eqn. 4.89-4.91
 
   dF0 = EPS * rad * (q_r[0] - q_l[0]);
   dF1 = EPS * rad * (q_r[1] - q_l[1]);
@@ -163,9 +161,9 @@ void aajkroeflux(double* q_l, double* q_r, double* rhs_m1, double* rhs, Dim *dim
 
   // Dylan: this looks like Harten's Entropy Correction but I'm not sure
   double lambda_tilda;
-  eig_a1 = abs(eig_a1);
-  eig_a2 = abs(eig_a2);
-  eig_a3 = abs(eig_a3);
+  eig_a1 = fabs(eig_a1);
+  eig_a2 = fabs(eig_a2);
+  eig_a3 = fabs(eig_a3);
   //lambda_tilda = max(4.0*(eig_r1 - eig_l1) + 1e-6, 0.0);
   if(4.0*(eig_r1 - eig_l1) + 1e-6 > 0.0)
     lambda_tilda = 4.0*(eig_r1 - eig_l1) + 1e-6;

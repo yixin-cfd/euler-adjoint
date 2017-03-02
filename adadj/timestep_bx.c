@@ -4,6 +4,7 @@
 #include <adBuffer.h>
 #include "../include/structures.h"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 /*
@@ -24,12 +25,15 @@ void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2],
     // xy3  is j  , k+1 pt
     double Sk[2], Sj[2];
     double Skb[2], Sjb[2];
-    int abs0;
-    int abs1;
+    double fabs0;
+    double fabs0b;
+    double fabs1;
+    double fabs1b;
     int ii1;
     double tempb;
     double tempb0;
     double tempb1;
+    int branch;
     Sk[0] = -xy2[1] + xy1[1];
     Sk[1] = xy2[0] - xy1[0];
     Sj[0] = xy3[1] - xy1[1];
@@ -37,10 +41,10 @@ void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2],
     //
     // Constant-CFL timestep
     //
-    int idx, j, k;
     double u, v, p, c2, irho;
     double ub, vb, pb, c2b, irhob;
     double uu, vv;
+    double uub, vvb;
     double xs2, ys2, xsc, ysc, eigmax;
     double xs2b, ys2b, xscb, yscb, eigmaxb;
     irho = 1.0/q[0];
@@ -56,22 +60,41 @@ void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2],
     ys2 = Sk[0]*Sk[0] + Sk[1]*Sk[1];
     xsc = sqrt(c2*xs2);
     ysc = sqrt(c2*ys2);
-    if (uu >= 0.)
-        abs0 = uu;
-    else
-        abs0 = -uu;
-    if (vv >= 0.)
-        abs1 = vv;
-    else
-        abs1 = -vv;
-    eigmax = abs0 + xsc + abs1 + ysc;
+    if (uu >= 0.0) {
+        fabs0 = uu;
+        pushcontrol1b(1);
+    } else {
+        fabs0 = -uu;
+        pushcontrol1b(0);
+    }
+    if (vv >= 0.0) {
+        fabs1 = vv;
+        pushcontrol1b(0);
+    } else {
+        fabs1 = -vv;
+        pushcontrol1b(1);
+    }
+    eigmax = fabs0 + xsc + fabs1 + ysc;
     //eigmax = fmax( abs(uu) + xsc, abs(vv) + ysc );
     // dt[0] = cfl * V[0] / eigmax;
     // actually dt over volume since later we would divide dt by volume anyway
+    // dt[0] = eigmax;
     eigmaxb = -(cfl*dtb[0]/(eigmax*eigmax));
     dtb[0] = 0.0;
+    fabs0b = eigmaxb;
     xscb = eigmaxb;
+    fabs1b = eigmaxb;
     yscb = eigmaxb;
+    popcontrol1b(&branch);
+    if (branch == 0)
+        vvb = fabs1b;
+    else
+        vvb = -fabs1b;
+    popcontrol1b(&branch);
+    if (branch == 0)
+        uub = -fabs0b;
+    else
+        uub = fabs0b;
     if (c2*xs2 == 0.0)
         tempb0 = 0.0;
     else
@@ -91,13 +114,17 @@ void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2],
         Sjb[ii1] = 0.0;
     Sjb[0] = Sjb[0] + 2*Sj[0]*xs2b;
     Sjb[1] = Sjb[1] + 2*Sj[1]*xs2b;
+    Skb[0] = Skb[0] + u*vvb;
+    Skb[1] = Skb[1] + v*vvb;
+    Sjb[0] = Sjb[0] + u*uub;
+    Sjb[1] = Sjb[1] + v*uub;
     pb = 1.4*irho*c2b;
     tempb1 = -(0.4*0.5*pb);
+    ub = Sj[0]*uub + q[0]*2*u*tempb1 + Sk[0]*vvb;
+    vb = Sj[1]*uub + q[0]*2*v*tempb1 + Sk[1]*vvb;
+    irhob = q[2]*vb + q[1]*ub + 1.4*p*c2b;
     qb[3] = qb[3] + 0.4*pb;
     qb[0] = qb[0] + (u*u+v*v)*tempb1;
-    ub = q[0]*2*u*tempb1;
-    vb = q[0]*2*v*tempb1;
-    irhob = q[2]*vb + q[1]*ub + 1.4*p*c2b;
     qb[2] = qb[2] + irho*vb;
     qb[1] = qb[1] + irho*ub;
     qb[0] = qb[0] - irhob/(q[0]*q[0]);

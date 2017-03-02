@@ -56,7 +56,7 @@ void ADadj::take_steps(int nsteps){
   //
   // Main iteration Loop
   //
-  file = fopen("res_adj.dat", "w");
+  file = fopen("res_adadj.dat", "w");
   fclose(file);
     
   for(i=0; i<nsteps; i++){
@@ -64,16 +64,16 @@ void ADadj::take_steps(int nsteps){
   
     step_number++;
 
-    if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
-      residual = sqrt(residual/(dim->jtot*dim->ktot));
-      liftd    = this->check();
-      printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
-      file = fopen("res_adj.dat", "a");
-      fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
-      fclose(file);
-    }
+    // if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
+    //   residual = sqrt(residual/(dim->jtot*dim->ktot));
+    //   liftd    = this->check();
+    //   printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
+    //   file = fopen("res_adadj.dat", "a");
+    //   fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
+    //   fclose(file);
+    // }
 
-    // printf("AD Res   is %25.16e\n", residual);
+    printf("AD Res   is %25.16e\n", residual);
 
   }
 
@@ -92,12 +92,20 @@ double ADadj::step(){
   memset( dtb, 0,   dim->pts*sizeof(double));
     
   this->flux(false);
+
   this->boundary_conditions(false);
 
   for(j=0; j<dim->jtot; j++){
   for(k=0; k<dim->ktot; k++){
 
     idx = j*dim->jstride + k*dim->kstride;
+
+    // if(j == 5 && k == 1){
+    //   printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+    // 	     qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
+    //   // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+    //   // 	     rhsb[idx][0], rhsb[idx][1], rhsb[idx][2], rhsb[idx][3]);
+    // }
 
     // add contribution from cost function
     qb[idx][0] = qb2[idx][0] + qb[idx][0];

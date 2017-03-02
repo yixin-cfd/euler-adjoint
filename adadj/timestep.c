@@ -1,5 +1,6 @@
 #include "structures.h"
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
@@ -18,7 +19,6 @@ void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
   //
   // Constant-CFL timestep
   //
-  int idx, j, k;
   double u, v, p, c2, irho;
   double uu, vv;
   double xs2, ys2, xsc, ysc, eigmax;
@@ -41,12 +41,15 @@ void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
   xsc = sqrt(c2*xs2);
   ysc = sqrt(c2*ys2);
 
-  eigmax = abs(uu) + xsc + abs(vv) + ysc;
+  eigmax = fabs(uu) + xsc + fabs(vv) + ysc;
   //eigmax = fmax( abs(uu) + xsc, abs(vv) + ysc );
 
   // dt[0] = cfl * V[0] / eigmax;
 
   // actually dt over volume since later we would divide dt by volume anyway
+
   dt[0] = cfl / eigmax;
+
+  // dt[0] = eigmax;
 
 }

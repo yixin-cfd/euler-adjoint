@@ -54,6 +54,15 @@ void ADadj::boundary_conditions(bool xbar){
   int i, idx, j, k;
   int widx;
 
+
+  // j = 5; k = 0;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	 qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	     rhsb[idx][0], rhsb[idx][1], rhsb[idx][2], rhsb[idx][3]);
+
+
   for(i=0; i<euler->inputs->nbc; i++){
 
     bc = euler->bc[i];
@@ -74,17 +83,14 @@ void ADadj::boundary_conditions(bool xbar){
       
       // periodic relies upon other values, pass full q pointer
       if(bc.type == PERIODIC_BC){
-      	periodic_bc_b(q, qb, rhs, dim, bc.face, j, k);
+      	// periodic_bc_b(q, qb, rhs, dim, bc.face, j, k);
       	rhsb_periodic_bc(qb, rhsb, dim, bc.face, j, k);
       }
       
-      // // dirichlet: set constant
-      // if(bc.type == FARFIELD_BC) farfield_bc(q[idx], euler->inputs);	
-      //
       if(bc.type == FARFIELD_BC){
-	rhsb[idx][0]  = 0.0; rhsb[idx][1]  = 0.0; rhsb[idx][2]  = 0.0; rhsb[idx][3]  = 0.0;
-	qb[idx][0]  = 0.0; qb[idx][1]  = 0.0; qb[idx][2]  = 0.0; qb[idx][3]  = 0.0;
-	// xyb[idx][0] = 0.0; xyb[idx][1] = 0.0;
+      	rhsb[idx][0]  = 0.0; rhsb[idx][1]  = 0.0; rhsb[idx][2]  = 0.0; rhsb[idx][3]  = 0.0;
+      	qb[idx][0]  = 0.0; qb[idx][1]  = 0.0; qb[idx][2]  = 0.0; qb[idx][3]  = 0.0;
+      	// xyb[idx][0] = 0.0; xyb[idx][1] = 0.0;
       }
 
       if(bc.type == WALL_BC){
@@ -103,5 +109,11 @@ void ADadj::boundary_conditions(bool xbar){
 
   }
 
+  // j = 5; k = 1;
+  // idx = j*dim->jstride + k*dim->kstride;
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	 qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
+  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+  // 	     rhsb[idx][0], rhsb[idx][1], rhsb[idx][2], rhsb[idx][3]);
 
 }
