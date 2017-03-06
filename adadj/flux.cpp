@@ -50,10 +50,9 @@ void ADadj::flux(bool xbar){
 		    grid->xy[idx], grid->xy[idx+dim->kstride], j, 1);
 
 	// if(j == 5 && k == 1){
-	//   printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
+	//   printf("__ %20.14e %20.14e %20.14e %20.14e \n", 
 	// 	 qb[idx][0], qb[idx][1], qb[idx][2], qb[idx][3]);
 	// }
-
 
     }
     }

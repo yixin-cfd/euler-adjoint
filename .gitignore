@@ -8,3 +8,5 @@ test/*
 */old/*
 adadj/*_b.*
 adadj/*_bx.*
+adjoint/*_b.*
+adjoint/scratch/*

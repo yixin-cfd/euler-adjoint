@@ -1,7 +1,7 @@
 #include "adjoint.hpp"
 
 template<BCface face>
-void periodic_bc(BC bc, double (*psi)[4], Dim *dim){
+void periodic_bc(BC bc, double (*psi)[4], double (*rhs)[4], Dim *dim){
 
   int j, k, idx, pidx;
   int pad = dim->nghost;
@@ -29,6 +29,16 @@ void periodic_bc(BC bc, double (*psi)[4], Dim *dim){
       psi[idx][1] = psi[pidx][1];
       psi[idx][2] = psi[pidx][2];
       psi[idx][3] = psi[pidx][3];
+
+      rhs[pidx][0] += rhs[idx][0];
+      rhs[pidx][1] += rhs[idx][1];
+      rhs[pidx][2] += rhs[idx][2];
+      rhs[pidx][3] += rhs[idx][3];
+
+      rhs[idx][0] = 0.0;
+      rhs[idx][1] = 0.0;
+      rhs[idx][2] = 0.0;
+      rhs[idx][3] = 0.0;
 
   }
   }
@@ -144,17 +154,17 @@ void Adjoint::boundary_conditions(){
 
     switch(euler->bc[i].face){
     case JMIN_FACE:
-      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<JMIN_FACE>(euler->bc[i], psi, dim);
+      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<JMIN_FACE>(euler->bc[i], psi,rhs, dim);
       break;
     case JMAX_FACE:
-      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<JMAX_FACE>(euler->bc[i], psi, dim);
+      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<JMAX_FACE>(euler->bc[i], psi,rhs, dim);
       break;
     case KMIN_FACE:
-      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<KMIN_FACE>(euler->bc[i], psi, dim);
+      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<KMIN_FACE>(euler->bc[i], psi,rhs, dim);
       if (euler->bc[i].type == WALL_BC)     wall_bc(euler->bc[i], psi, q, rhs, grid->Sk, dim);
       break;
     case KMAX_FACE:
-      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<KMAX_FACE>(euler->bc[i], psi, dim);
+      if (euler->bc[i].type == PERIODIC_BC) periodic_bc<KMAX_FACE>(euler->bc[i], psi,rhs, dim);
       break;
 
     }

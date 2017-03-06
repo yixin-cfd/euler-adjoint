@@ -16,17 +16,17 @@ void Adjoint::take_steps(int nsteps){
     residual = step();
     step_number++;
 
-    // if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
-    //   residual = sqrt(residual/(dim->jtot*dim->ktot));
-    //   liftd    = 1.0;
-    //   printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
-    //   file = fopen("res_adj.dat", "a");
-    //   fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
-    //   fclose(file);
-    //   if(residual > 10) return;
-    // }
+    if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
+      residual = sqrt(residual/(dim->jtot*dim->ktot));
+      liftd    = 1.0;
+      printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
+      file = fopen("res_adj.dat", "a");
+      fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
+      fclose(file);
+      if(residual > 10) return;
+    }
 
-    printf("Residual is %25.16e\n", residual);
+    // printf("Residual is %25.16e\n", residual);
   }
 }
 
@@ -44,27 +44,12 @@ double Adjoint::step(){
 
   this->aflux();
 
-
-  // j = 5; k = 1;
-  // idx = j*dim->jstride + k*dim->kstride;
-  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
-  // 	 rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
-  // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
-  // 	     psi[idx][0], psi[idx][1], psi[idx][2], psi[idx][3]);
-
   this->boundary_conditions();
 
   for(j=0; j<dim->jtot; j++){
   for(k=0; k<dim->ktot; k++){
 
     idx = j*dim->jstride + k*dim->kstride;
-
-    // if(j == 5 && k == 1){
-    //   printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
-    //   	     rhs[idx][0], rhs[idx][1], rhs[idx][2], rhs[idx][3]);
-    //   // printf("__ %20.16e %20.16e %20.16e %20.16e \n", 
-    //   // 	     psi[idx][0], psi[idx][1], psi[idx][2], psi[idx][3]);
-    // }
 
     // add contribution from cost function
     rhs[idx][0] = rhs0[idx][0] + rhs[idx][0];

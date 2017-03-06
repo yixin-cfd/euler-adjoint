@@ -132,7 +132,8 @@ target_link_libraries(adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 #
 # Library: Adjoint
 #
-file(GLOB adjoint_sources "${2DFLOW_SOURCE_DIR}/adjoint/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+file(GLOB adjoint_sources "${2DFLOW_SOURCE_DIR}/adjoint/*.c" "${2DFLOW_SOURCE_DIR}/adjoint/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+# file(GLOB adjoint_sources "${2DFLOW_SOURCE_DIR}/adjoint/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
 
 add_library(adjoint SHARED ${adjoint_sources})
 
@@ -142,8 +143,6 @@ set_target_properties(adjoint PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
   LIBRARY_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
   )
-
-list(APPEND INCLUDE_DIRS "$ENV{TAPENADE_HOME}/include")
 
 target_compile_definitions(adjoint PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(adjoint PUBLIC ${INCLUDE_DIRS})

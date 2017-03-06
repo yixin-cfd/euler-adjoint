@@ -83,7 +83,7 @@ void ADadj::boundary_conditions(bool xbar){
       
       // periodic relies upon other values, pass full q pointer
       if(bc.type == PERIODIC_BC){
-      	// periodic_bc_b(q, qb, rhs, dim, bc.face, j, k);
+      	periodic_bc_b(q, qb, rhs, dim, bc.face, j, k);
       	rhsb_periodic_bc(qb, rhsb, dim, bc.face, j, k);
       }
       
