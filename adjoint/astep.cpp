@@ -18,7 +18,7 @@ void Adjoint::take_steps(int nsteps){
 
     if(step_number % euler->inputs->resid == 0 || step_number == nsteps){
       residual = sqrt(residual/(dim->jtot*dim->ktot));
-      liftd    = 1.0;
+      liftd    = this->check();
       printf("%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
       file = fopen("res_adj.dat", "a");
       fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);

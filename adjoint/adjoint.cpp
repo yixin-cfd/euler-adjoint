@@ -19,6 +19,7 @@ Adjoint::Adjoint(Euler *e){
   psi     = new double[dim->pts][4];
   rhs     = new double[dim->pts][4];
   rhs0    = new double[dim->pts][4];
+  xyb     = new double[dim->pts][2];
 
   scratch = new double[dim->pts*4];
 
@@ -112,6 +113,7 @@ Adjoint::~Adjoint(){
   delete rhs;
   delete rhs0;
   delete dt;
+  delete xyb;
 
   printf("Adjoint Destroyed\n");
 

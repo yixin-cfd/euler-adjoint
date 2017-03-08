@@ -12,12 +12,22 @@ ALL :  tmpflux_b.c
 #	       -o tmpflux  \
 #	       tmpflux.c && cat *.msg
 
+#tmpflux_b.c : tmpflux.c
+#	${TPN} -reverse                      \
+#	       -inputlanguage  c             \
+#	       -outputlanguage c             \
+#	       -I              ../include    \
+#	       -head           "tmpflux(q, rrhs)/(q rrhs)" \
+#	       -adjfuncname    "_b"                     \
+#	       -o tmpflux  \
+#	       tmpflux.c && cat *.msg
+
 tmpflux_b.c : tmpflux.c
 	${TPN} -reverse                      \
 	       -inputlanguage  c             \
 	       -outputlanguage c             \
 	       -I              ../include    \
-	       -head           "tmpflux(q, rrhs)/(q rrhs)" \
+	       -head           "tmpflux(xy1 xy2 rhs_m1 rhs)/(xy1 xy2 rhs_m1 rhs)" \
 	       -adjfuncname    "_b"                     \
 	       -o tmpflux  \
 	       tmpflux.c && cat *.msg

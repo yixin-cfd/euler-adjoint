@@ -183,8 +183,23 @@ double ADadj::check(){
   // printf("lift is %lf\n", actual_cost*8);
   //printf("testing123 %e", actual_cost);
 
-  this->flux(true);
   this->boundary_conditions(true);
+
+  this->flux(true);
+
+  // double tmpres = 0.0;
+  // for(k=0; k<dim->ktot; k++){
+  //   for(j=0; j<dim->jtot; j++){
+  //     idx = j*jstride + k*kstride;
+  //     tmpres += xyb[idx][0]*xyb[idx][0] + xyb[idx][1]*xyb[idx][1];
+  //     // if(std::abs(xyb[idx][1]) > 1e-12){
+  //     if(j == 5 && k == 1){
+  //     	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+  //     }
+  //   }
+  // }
+  // printf("x res: %20.14e\n", tmpres);
+
 
   double liftd = 0.0;
   for(i=0; i<dim->pts; i++){

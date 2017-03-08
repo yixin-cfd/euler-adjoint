@@ -9,13 +9,20 @@
 // 	     Dim *dim, double S[2], int mini, int maxi){
 //   double f[4];
   
-void tmpflux(double (*q)[4], double (*rrhs)[4], 
-	     int lidx, int ridx, Dim *dim, double S[2], int mini, int maxi){
-  double *q_l    = q[lidx];
-  double *q_r    = q[ridx];
-  double *rhs    = rrhs[ridx];
-  double *rhs_m1 = rrhs[lidx];
+// void tmpflux(double (*q)[4], double (*rrhs)[4], 
+// 	     int lidx, int ridx, Dim *dim, double S[2], int mini, int maxi){
+//   double *q_l    = q[lidx];
+//   double *q_r    = q[ridx];
+//   double *rhs    = rrhs[ridx];
+//   double *rhs_m1 = rrhs[lidx];
+//   double f[4];
+
+void tmpflux(double* q_l, double* q_r, double *rhs_m1, double* rhs, 
+	     Dim *dim, double xy1[2], double xy2[2], int mini, int maxi){
   double f[4];
+  double S[2];
+  S[0] =   xy2[1] - xy1[1];
+  S[1] = - xy2[0] + xy1[0];
 
   double rho_l  = q_l[0];
   double rho_r  = q_r[0];

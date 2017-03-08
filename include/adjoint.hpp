@@ -25,6 +25,7 @@ class Adjoint {
   double arhs_times_dt();
   void update_psi();
   void timestep();
+  double check();
   void cost(double (*r)[4]);
 
  public:
@@ -50,6 +51,7 @@ class Adjoint {
   double (*q)[4];
   double (*rhs)[4];
   double (*rhs0)[4];
+  double (*xyb)[2];
 
 };
 
