@@ -6,8 +6,8 @@
 #define EPS 0.25
 
 // void tmpflux(double* q_l, double* q_r, double *rhs_m1, double* rhs, 
-// 	     Dim *dim, double S[2], int mini, int maxi){
-//   double f[4];
+  // 	     Dim *dim, double S[2], int mini, int maxi){
+  // double f[4];
   
 // void tmpflux(double (*q)[4], double (*rrhs)[4], 
 // 	     int lidx, int ridx, Dim *dim, double S[2], int mini, int maxi){
@@ -52,18 +52,18 @@ void tmpflux(double* q_l, double* q_r, double *rhs_m1, double* rhs,
 
   double dF0=0.0, dF1=0.0, dF2=0.0, dF3=0.0;
 
-  // double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
-  // double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
-  // double eig_l, eig_r;
-  // eig_l =  sqrt(V_l*V_l) + c_l;
-  // eig_r =  sqrt(V_r*V_r) + c_r;
+  double c_l  = sqrt((GAMMA*p_l)*inv_rho_l);
+  double c_r  = sqrt((GAMMA*p_r)*inv_rho_r);
+  double eig_l, eig_r;
+  eig_l =  sqrt(V_l*V_l) + c_l;
+  eig_r =  sqrt(V_r*V_r) + c_r;
 
-  // double rad = 0.5*(eig_l + eig_r);
+  double rad = 0.5*(eig_l + eig_r);
 
-  // dF0 = EPS * rad * (q_r[0] - q_l[0]);
-  // dF1 = EPS * rad * (q_r[1] - q_l[1]);
-  // dF2 = EPS * rad * (q_r[2] - q_l[2]);
-  // dF3 = EPS * rad * (q_r[3] - q_l[3]);
+  dF0 = EPS * rad * (q_r[0] - q_l[0]);
+  dF1 = EPS * rad * (q_r[1] - q_l[1]);
+  dF2 = EPS * rad * (q_r[2] - q_l[2]);
+  dF3 = EPS * rad * (q_r[3] - q_l[3]);
 
   double half_face = 0.5*mag;
 

@@ -1,8 +1,7 @@
 #include "adjoint.hpp"
 #include "yaml-cpp/yaml.h"
-#define PY_ARRAY_UNIQUE_SYMBOL euler_ARRAY_API
+#define PY_ARRAY_UNIQUE_SYMBOL adjoint_ARRAY_API
 #include <numpy/ndarrayobject.h>
-
 
 Adjoint::Adjoint(Euler *e){
 

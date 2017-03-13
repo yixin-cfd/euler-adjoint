@@ -189,22 +189,7 @@ void Adjoint::aflux(){
     mini = (j == dim->nghost);
     maxi = (j == dim->nghost + dim->jmax);
 
-    adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f1, f2, dim, grid->Sj[idx], A, mini, maxi);
-    rhs[idx1][0] += f1[0];
-    rhs[idx1][1] += f1[1];
-    rhs[idx1][2] += f1[2];
-    rhs[idx1][3] += f1[3];
-    rhs[idx][0]  += f2[0];
-    rhs[idx][1]  += f2[1];
-    rhs[idx][2]  += f2[2];
-    rhs[idx][3]  += f2[3];
-
-    // --------------------------------------------------------------------------------
-    
-    // f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
-    // f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
-    // 	      dim, grid->Sj[idx], mini, maxi);
+    // adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f1, f2, dim, grid->Sj[idx], A, mini, maxi);
     // rhs[idx1][0] += f1[0];
     // rhs[idx1][1] += f1[1];
     // rhs[idx1][2] += f1[2];
@@ -213,6 +198,21 @@ void Adjoint::aflux(){
     // rhs[idx][1]  += f2[1];
     // rhs[idx][2]  += f2[2];
     // rhs[idx][3]  += f2[3];
+
+    // --------------------------------------------------------------------------------
+    
+    f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
+    f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
+    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
+    // 	      dim, grid->Sj[idx], mini, maxi);
+    rhs[idx1][0] += f1[0];
+    rhs[idx1][1] += f1[1];
+    rhs[idx1][2] += f1[2];
+    rhs[idx1][3] += f1[3];
+    rhs[idx][0]  += f2[0];
+    rhs[idx][1]  += f2[1];
+    rhs[idx][2]  += f2[2];
+    rhs[idx][3]  += f2[3];
 
 
     // --------------------------------------------------------------------------------
@@ -257,22 +257,7 @@ void Adjoint::aflux(){
     mini = (k == dim->nghost);
     maxi = (k == dim->nghost + dim->kmax);
 
-    adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f1, f2, dim, grid->Sk[idx], A, mini, maxi);
-    rhs[idx1][0] += f1[0];
-    rhs[idx1][1] += f1[1];
-    rhs[idx1][2] += f1[2];
-    rhs[idx1][3] += f1[3];
-    rhs[idx][0]  += f2[0];
-    rhs[idx][1]  += f2[1];
-    rhs[idx][2]  += f2[2];
-    rhs[idx][3]  += f2[3];
-
-    // ----------------------------------------------------------------------------------------
-
-    // f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
-    // f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
-    // 	      dim, grid->Sk[idx], mini, maxi);
+    // adj_flux(q[idx1], q[idx], psi[idx1], psi[idx], f1, f2, dim, grid->Sk[idx], A, mini, maxi);
     // rhs[idx1][0] += f1[0];
     // rhs[idx1][1] += f1[1];
     // rhs[idx1][2] += f1[2];
@@ -281,6 +266,21 @@ void Adjoint::aflux(){
     // rhs[idx][1]  += f2[1];
     // rhs[idx][2]  += f2[2];
     // rhs[idx][3]  += f2[3];
+
+    // ----------------------------------------------------------------------------------------
+
+    f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
+    f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
+    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
+    // 	      dim, grid->Sk[idx], mini, maxi);
+    rhs[idx1][0] += f1[0];
+    rhs[idx1][1] += f1[1];
+    rhs[idx1][2] += f1[2];
+    rhs[idx1][3] += f1[3];
+    rhs[idx][0]  += f2[0];
+    rhs[idx][1]  += f2[1];
+    rhs[idx][2]  += f2[2];
+    rhs[idx][3]  += f2[3];
 
     // ----------------------------------------------------------------------------------------
     // memset(fff[idx1], 0, 4*sizeof(double));
@@ -300,38 +300,38 @@ void Adjoint::aflux(){
   }
 
   double sign=1.0;
-  //
-  // Dissipation: J-Direction 
-  //
-  for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
-  for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+  // //
+  // // Dissipation: J-Direction 
+  // //
+  // for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
+  // for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
-    idx  = j*dim->jstride + k*dim->kstride;
-    idx1 = idx-dim->jstride;
+  //   idx  = j*dim->jstride + k*dim->kstride;
+  //   idx1 = idx-dim->jstride;
 
-    adj_diss(q[idx1], q[idx], psi[idx1], psi[idx], d1, dim, grid->Sj[idx]);
-    for(int i=0; i<4; i++){
-      rhs[idx ][i] += sign*d1[i];
-      rhs[idx1][i] -= sign*d1[i];
-    }
-  }
-  }
-  //
-  // Dissipation: K-direction
-  //
-  for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
-  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+  //   adj_diss(q[idx1], q[idx], psi[idx1], psi[idx], d1, dim, grid->Sj[idx]);
+  //   for(int i=0; i<4; i++){
+  //     rhs[idx ][i] += sign*d1[i];
+  //     rhs[idx1][i] -= sign*d1[i];
+  //   }
+  // }
+  // }
+  // //
+  // // Dissipation: K-direction
+  // //
+  // for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
+  // for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 
-    idx  = j*dim->jstride + k*dim->kstride;
-    idx1 = idx-dim->kstride;
+  //   idx  = j*dim->jstride + k*dim->kstride;
+  //   idx1 = idx-dim->kstride;
 
-    adj_diss(q[idx1], q[idx], psi[idx1], psi[idx], d1, dim, grid->Sk[idx]);
-    for(int i=0; i<4; i++){
-      rhs[idx ][i] += sign*d1[i];
-      rhs[idx1][i] -= sign*d1[i];
-    }
-  }
-  }
+  //   adj_diss(q[idx1], q[idx], psi[idx1], psi[idx], d1, dim, grid->Sk[idx]);
+  //   for(int i=0; i<4; i++){
+  //     rhs[idx ][i] += sign*d1[i];
+  //     rhs[idx1][i] -= sign*d1[i];
+  //   }
+  // }
+  // }
 
   delete fff;
 

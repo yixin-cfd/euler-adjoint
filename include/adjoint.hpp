@@ -25,7 +25,6 @@ class Adjoint {
   double arhs_times_dt();
   void update_psi();
   void timestep();
-  double check();
   void cost(double (*r)[4]);
 
  public:
@@ -36,9 +35,11 @@ class Adjoint {
   void write_solution(std::string name);
   void take_steps(int n);
   void go();
+  double check();
   double step();
   void save_restart(std::string fname);
   void read_restart(std::string fname);
+  double sens_xd(boost::python::object xdo);
   // int write_to_file(std::string s);
   // void metrics();
 

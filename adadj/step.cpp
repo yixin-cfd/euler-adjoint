@@ -187,25 +187,28 @@ double ADadj::check(){
 
   this->flux(true);
 
-  // double tmpres = 0.0;
-  // for(k=0; k<dim->ktot; k++){
-  //   for(j=0; j<dim->jtot; j++){
-  //     idx = j*jstride + k*kstride;
-  //     tmpres += xyb[idx][0]*xyb[idx][0] + xyb[idx][1]*xyb[idx][1];
-  //     // if(std::abs(xyb[idx][1]) > 1e-12){
-  //     if(j == 5 && k == 1){
-  //     	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-  //     }
-  //   }
-  // }
-  // printf("x res: %20.14e\n", tmpres);
+  double tmpres = 0.0;
+  for(k=0; k<dim->ktot; k++){
+    for(j=0; j<dim->jtot; j++){
+      idx = j*jstride + k*kstride;
+      tmpres += xyb[idx][0]*xyb[idx][0] + xyb[idx][1]*xyb[idx][1];
+      // if(std::abs(xyb[idx][1]) > 1e-12){
+      if(j == 5 && k == 1){
+      	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+      }
+    }
+  }
+  printf("x res: %20.14e\n", tmpres);
 
 
   double liftd = 0.0;
+  double tmp1, tmp2;
   for(i=0; i<dim->pts; i++){
-
-    liftd += xyb[i][0]*xd[i][0] + xyb[i][1]*xd[i][1];
-
+    tmp1 = xd[i][0];
+    tmp2 = xd[i][1];
+    // tmp1 = 1.0*(i == 5*dim->jstride + 1*dim->kstride);
+    // tmp2 = 1.0*(i == 5*dim->jstride + 1*dim->kstride);
+    liftd += xyb[i][0]*tmp1 + xyb[i][1]*tmp2;
   }
 
   delete xd;
@@ -218,7 +221,7 @@ double ADadj::sens_xd(boost::python::object xdo){
 
   PyArrayObject *arr = (PyArrayObject*) xdo.ptr();
 
-  int ndim, len;
+  int ndim;
   npy_intp *dims;
 
   ndim = PyArray_NDIM(arr);

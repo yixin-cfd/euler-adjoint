@@ -1,4 +1,7 @@
 #include "adjoint.hpp"
+#define NO_IMPORT_ARRAY
+#define PY_ARRAY_UNIQUE_SYMBOL adjoint_ARRAY_API
+#include <numpy/ndarrayobject.h>
 
 void Adjoint::take_steps(int nsteps){
 
@@ -76,39 +79,50 @@ double Adjoint::step(){
   }
 
   return residual;
+}
 
-  // memset(rhs, 0, dim->pts*4*sizeof(double));
 
-  // //this->timestep();
-  // timestep(q, grid->Sj, grid->Sk, grid->V, dim, inputs->cfl, dt);
+double Adjoint::sens_xd(boost::python::object xdo){
 
-  // this->boundary_conditions();
+  PyArrayObject *arr = (PyArrayObject*) xdo.ptr();
 
-  // this->flux();
+  int ndim, j, k, idx, xidx;
+  npy_intp *dims;
+  double costd;
 
-  // residual = this->rhs_times_dt();
+  ndim = PyArray_NDIM(arr);
+  dims = PyArray_DIMS(arr);
 
-  // if((step_number+1)%inputs->resid == 0){
+  int xjstride = 1;
+  int xkstride = dims[1];
 
-  //   if(residual != residual){
-  //     throw 234;
-  //   }
-  //   printf("%d : %12.8e\n", step_number+1, residual);
-  //   f = fopen("residual.dat", "a");
-  //   fprintf(f,"%d %E\n", step_number+1, residual);
-  //   fclose(f);
-  // }
+  if(ndim != 3){
+    printf("ndim not 3\n");
+  }
 
-  // if(inputs->ilhs > 0){
-  //   this->dadi();
-  // }
+  if(dims[2] != 2){
+    printf("last dim should be 2!\n");
+  }
 
-  // this->update_q();
+  double (*xd)[2] = (double (*)[2])PyArray_DATA(arr);
 
-  // // if((step_number+1)%inputs->resid == 0){
+  // get the deriv w.r.t. X and Y
+  this->check();
 
-  // //   int idx = 190*dim->jstride + 3*dim->kstride;
-  // //   printf("q %e %e %e %e\n", q[idx][0], q[idx][1], q[idx][2], q[idx][3]);
+  costd = 0.0;
+  for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
+    for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
+      
+      idx  = j*dim->jstride + k*dim->kstride;
+      
+      // the provided delta does NOT have ghosts
+      xidx = (j-dim->nghost)*xjstride + (k-dim->nghost)*xkstride;
+      
+      costd += xyb[idx][0]*xd[xidx][0] + xyb[idx][1]*xd[xidx][1];
+      
+    }
+  }
 
-  // // }
+  return costd;
+
 }

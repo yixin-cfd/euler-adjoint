@@ -1,9 +1,9 @@
-#include "adjoint.hpp"
+#include "adadj.hpp"
 #include <stdio.h>
 
 #define DEBUG 1
 
-void Adjoint::write_solution(std::string fname){
+void ADadj::write_solution(std::string fname){
 
   int j, k, idx, var;
   FILE *fid;
@@ -41,12 +41,12 @@ void Adjoint::write_solution(std::string fname){
     for (k=ng;k<dim->ktot-ng;k++){
       for (j=ng;j<dim->jtot-ng;j++){
   	idx = j*jstride + k*kstride;
-  	if(psi[idx][var] != psi[idx][var]){
+  	if(rhsb[idx][var] != rhsb[idx][var]){
   	  // printf("found a nan at %d %d\n", j, k);
   	  errc++;
   	}
   	if(errc < 5){
-  	  fprintf(fid, "%25.16e\n", psi[idx][var]);	  
+  	  fprintf(fid, "%25.16e\n", rhsb[idx][var]);	  
   	} else {
   	  printf("TOO MANY ERRORS, NOT FINISHING SOLUTION\n");
   	  fclose(fid);

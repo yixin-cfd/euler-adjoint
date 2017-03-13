@@ -33,6 +33,7 @@ void ADadj::read_restart(std::string fname){
 
   if(test_jtot != dim->jtot || test_ktot != dim->ktot){
     printf("dimension mismatch, not reading restart\n");
+    fclose(fid);
     return;
   }
 

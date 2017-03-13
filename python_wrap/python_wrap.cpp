@@ -56,12 +56,18 @@ BOOST_PYTHON_MODULE(libflow){
     .def("read_restart", &ADadj::read_restart)
     .def("check",&ADadj::check)
     .def("sens_xd",&ADadj::sens_xd)
+    .def("write_solution", &ADadj::write_solution)
     ;
 
   class_<Adjoint>("Adjoint", init<Euler*>())
     .def("init", &Adjoint::init)
     .def("take_steps",&Adjoint::take_steps)
     .def("say_hello",&Adjoint::say_hello)
+    .def("sens_xd",&Adjoint::sens_xd)
+    .def("check",&Adjoint::check)
+    .def("save_restart",&Adjoint::save_restart)    
+    .def("read_restart",&Adjoint::read_restart)
+    .def("write_solution", &Adjoint::write_solution)
     ;
 
 }

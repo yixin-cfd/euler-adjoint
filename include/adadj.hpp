@@ -44,6 +44,7 @@ public:
   void read_restart(std::string n);
   void save_restart(std::string n);
   void take_steps(int sn);
+  void write_solution(std::string name);
 
 };
 
