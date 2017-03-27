@@ -72,6 +72,11 @@ void tmpflux(double* q_l, double* q_r, double *rhs_m1, double* rhs,
   f[2] = half_face*( (rho_l*v_l*V_l + p_l*r2) + (rho_r*v_r*V_r + p_r*r2) - dF2);
   f[3] = half_face*( (e_l+p_l)*V_l + (e_r+p_r)*V_r                       - dF3);
 
+  // f[0] = half_face*( - dF0);
+  // f[1] = half_face*( - dF1);
+  // f[2] = half_face*( - dF2);
+  // f[3] = half_face*( - dF3);
+
   rhs_m1[0] = rhs_m1[0] + f[0]*(1-mini);
   rhs_m1[1] = rhs_m1[1] + f[1]*(1-mini);
   rhs_m1[2] = rhs_m1[2] + f[2]*(1-mini);

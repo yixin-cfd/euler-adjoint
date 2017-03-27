@@ -119,6 +119,10 @@ double Adjoint::sens_xd(boost::python::object xdo){
       xidx = (j-dim->nghost)*xjstride + (k-dim->nghost)*xkstride;
       
       costd += xyb[idx][0]*xd[xidx][0] + xyb[idx][1]*xd[xidx][1];
+
+      if(j == 5 && k == 1){
+      	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+      }
       
     }
   }
