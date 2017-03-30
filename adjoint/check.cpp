@@ -272,8 +272,6 @@ double Adjoint::check(){
   // fill rhs values WITHOUT dependence on cost function
   this->aflux();
 
-  // this->boundary_conditions();
-
   // find dependence of residual on x
   dRdxy(q, psi, xyb, f, grid, dim);
   
@@ -283,75 +281,12 @@ double Adjoint::check(){
     dBCdxy(euler->bc[i], q, rhs, xyb, dim, grid);
   }
 
-  j = 5; k = 1; idx = j*jstride + k*kstride;
-  printf("xy %d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+  // j = 5; k = 1; idx = j*jstride + k*kstride;
+  // printf("xy %d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
   // j = 5; k = 1; idx = j*jstride + k*kstride;
   // printf("qb %d %d: %20.14e %20.14e \n", j, k, rhs[idx][1], rhs[idx][2]);
 
   // double tmpres = 0.0;
-  // for(k=0; k<dim->ktot; k++){
-  //   for(j=0; j<dim->jtot; j++){
-  //     idx = j*dim->jstride + k*dim->kstride;
-  //     tmpres += xyb[idx][0]*xyb[idx][0] + xyb[idx][1]*xyb[idx][1];
-  //     // if(std::abs(xyb[idx][1]) > 1e-12){
-  //     if(j == 5 && k == 1){
-  //     	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-  //     }
-  //   }
-  // }
-  // printf("x res: %20.14e\n", tmpres);
-
-  // printf("now auto method\n");
-  // memset(xyb, 0, 2*dim->pts*sizeof(double));
-  // for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
-  // for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
-  //   idx  = j*dim->jstride + k*dim->kstride;
-  //   idx1 = idx-dim->jstride;
-  //   mini = (j == dim->nghost);
-  //   maxi = (j == dim->nghost + dim->jmax);
-  //   f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
-  //   f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-  //   tmpflux_b(q[idx1], q[idx], d1, psi[idx1], d2, psi[idx], dim, 
-  //       grid->xy[idx], f1,
-  //       grid->xy[idx+dim->kstride], f2,
-  //       mini, maxi);
-  //   xyb[idx             ][0] += f1[0];
-  //   xyb[idx             ][1] += f1[1];
-  //   xyb[idx+dim->kstride][0] += f2[0];
-  //   xyb[idx+dim->kstride][1] += f2[1];
-
-  //   // if(j == 5 && k == 1){
-  //   //   printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-  //   // }
-
-  // }
-  // }
-
-  // for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
-  // for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
-  //   idx  = j*dim->jstride + k*dim->kstride;
-  //   idx1 = idx-dim->kstride;
-  //   mini = (k == dim->nghost);
-  //   maxi = (k == dim->nghost + dim->kmax);
-  //   f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
-  //   f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-  //   tmpflux_b(q[idx1], q[idx], d1, psi[idx1], d2, psi[idx], dim, 
-  //       grid->xy[idx+dim->jstride], f1,
-  //       grid->xy[idx], f2,
-  //       mini, maxi);
-  //   xyb[idx+dim->jstride][0] += f1[0];
-  //   xyb[idx+dim->jstride][1] += f1[1];
-  //   xyb[idx             ][0] += f2[0];
-  //   xyb[idx             ][1] += f2[1];
-
-  //   // if(j == 5 && k == 1){
-  //   //   printf("%d %d: %20.14e %20.14e \n", j, k, f2[0], f2[1]);
-  //   // }
-
-  // }
-  // }
-
-  // tmpres = 0.0;
   // for(k=0; k<dim->ktot; k++){
   //   for(j=0; j<dim->jtot; j++){
   //     idx = j*dim->jstride + k*dim->kstride;
@@ -372,8 +307,6 @@ double Adjoint::check(){
   for(i=0; i<dim->pts; i++){
     tmp1 = grid->xy[i][1];
     tmp2 = -grid->xy[i][0];
-    // tmp1 = 1.0*(i == 5*dim->jstride + 1*dim->kstride);
-    // tmp2 = 1.0*(i == 5*dim->jstride + 1*dim->kstride);
     liftd += xyb[i][0]*tmp1 + xyb[i][1]*tmp2;
   }
 

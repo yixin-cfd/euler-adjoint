@@ -26,7 +26,10 @@ void Adjoint::take_steps(int nsteps){
       file = fopen("res_adj.dat", "a");
       fprintf(file, "%5d  %15.6e  %15.8e\n", step_number, residual, liftd);
       fclose(file);
-      if(residual > 10) return;
+      if(residual > 10){
+	printf("\n***** BOOM ******\n\n");
+	return;
+      }
     }
 
     // printf("Residual is %25.16e\n", residual);
@@ -120,9 +123,9 @@ double Adjoint::sens_xd(boost::python::object xdo){
       
       costd += xyb[idx][0]*xd[xidx][0] + xyb[idx][1]*xd[xidx][1];
 
-      if(j == 5 && k == 1){
-      	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-      }
+      // if(j == 5 && k == 1){
+      // 	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+      // }
       
     }
   }
