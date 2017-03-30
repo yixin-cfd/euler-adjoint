@@ -203,8 +203,8 @@ void Adjoint::aflux(){
     
     f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
     f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
-    // 	      dim, grid->Sj[idx], mini, maxi);
+    tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
+    	      dim, grid->Sj[idx], mini, maxi);
     rhs[idx1][0] += f1[0];
     rhs[idx1][1] += f1[1];
     rhs[idx1][2] += f1[2];
@@ -271,8 +271,8 @@ void Adjoint::aflux(){
 
     f1[0] = 0.0; f1[1] = 0.0; f1[2] = 0.0; f1[3] = 0.0;
     f2[0] = 0.0; f2[1] = 0.0; f2[2] = 0.0; f2[3] = 0.0;
-    // tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
-    // 	      dim, grid->Sk[idx], mini, maxi);
+    tmpflux_b(q[idx1], f1, q[idx], f2, d1, psi[idx1], d2, psi[idx], 
+    	      dim, grid->Sk[idx], mini, maxi);
     rhs[idx1][0] += f1[0];
     rhs[idx1][1] += f1[1];
     rhs[idx1][2] += f1[2];

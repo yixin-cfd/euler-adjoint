@@ -213,6 +213,46 @@ void dRdxy(double (*q)[4], double (*psi)[4], double (*xyb)[2], double (*f)[4],
 
   }
   }
+}
+
+void dBCdxy(BC bc, double (*q)[4], double (*rhs)[4], double (*xyb)[2], Dim *dim, Grid *grid){
+
+  int j, k, idx, midx, widx;
+  double Sx, Sy, Sxb, Syb, SS;
+  int jstride, kstride;
+  jstride = dim->jstride;
+  kstride = dim->kstride;
+
+  for(k=bc.ks; k<=bc.ke; k++){
+    for(j=bc.js; j<=bc.je; j++){
+	
+      idx  = j*dim->jstride + k*dim->kstride;
+      midx = j*jstride + (2*dim->nghost - k - 1)*kstride;
+      widx = j*jstride + dim->nghost*kstride;
+  
+      Sx   = grid->Sk[widx][0];
+      Sy   = grid->Sk[widx][1];
+	   
+      SS   = Sx*Sx + Sy*Sy;
+
+      Sxb  = ( -4.0*q[midx][1]*( (SS * Sx -     Sx*Sx*Sx)/(SS*SS))
+      	       -2.0*q[midx][2]*( (SS * Sy - 2.0*Sx*Sx*Sy)/(SS*SS)) )*rhs[idx][1];
+      Syb  = ( -4.0*q[midx][1]*( (        -     Sx*Sx*Sy)/(SS*SS))
+      	       -2.0*q[midx][2]*( (SS * Sx - 2.0*Sx*Sy*Sy)/(SS*SS)) )*rhs[idx][1];
+
+      Sxb += ( -2.0*q[midx][1]*( (SS * Sy - 2.0*Sx*Sx*Sy)/(SS*SS))
+      	       -4.0*q[midx][2]*( (        -     Sy*Sy*Sx)/(SS*SS)) )*rhs[idx][2];
+      Syb += ( -2.0*q[midx][1]*( (SS * Sx - 2.0*Sx*Sy*Sy)/(SS*SS))
+      	       -4.0*q[midx][2]*( (SS * Sy -     Sy*Sy*Sy)/(SS*SS)) )*rhs[idx][2];
+
+      xyb[midx             ][1] += Sxb;
+      xyb[midx+dim->jstride][1] -= Sxb;
+      xyb[midx             ][0] -= Syb;
+      xyb[midx+dim->jstride][0] += Syb;
+
+    }
+  }
+
 
 }
 
@@ -221,11 +261,32 @@ double Adjoint::check(){
   int i, j, k, idx, idx1;
   double (*f)[4]  = (double (*)[4])this->scratch;
   double f1[2], f2[2], d1[2], d2[2];
+  int jstride = dim->jstride;
+  int kstride = dim->kstride;
 
   int mini, maxi;
 
-  memset(xyb, 0, 2*dim->pts*sizeof(double));
+  memset( rhs, 0, 4*dim->pts*sizeof(double));
+  memset( xyb, 0, 2*dim->pts*sizeof(double));
+
+  // fill rhs values WITHOUT dependence on cost function
+  this->aflux();
+
+  // this->boundary_conditions();
+
+  // find dependence of residual on x
   dRdxy(q, psi, xyb, f, grid, dim);
+  
+  // find dependence of bcs on x
+  for(i=0; i<euler->inputs->nbc; i++){
+    if (euler->bc[i].type != WALL_BC) continue;
+    dBCdxy(euler->bc[i], q, rhs, xyb, dim, grid);
+  }
+
+  j = 5; k = 1; idx = j*jstride + k*kstride;
+  printf("xy %d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
+  // j = 5; k = 1; idx = j*jstride + k*kstride;
+  // printf("qb %d %d: %20.14e %20.14e \n", j, k, rhs[idx][1], rhs[idx][2]);
 
   // double tmpres = 0.0;
   // for(k=0; k<dim->ktot; k++){

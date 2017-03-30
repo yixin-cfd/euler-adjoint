@@ -41,7 +41,7 @@ void wall_bc(double (*q)[4], double (*rhs)[4], Dim *dim,
   int kstride = dim->kstride;
   int pad = dim->nghost;
 
-  double Sx, Sy, imag, mag;
+  double Sx, Sy, imag2;
 
   Sx = - xy2[1] + xy1[1];
   Sy =   xy2[0] - xy1[0];
@@ -54,41 +54,13 @@ void wall_bc(double (*q)[4], double (*rhs)[4], Dim *dim,
   widx = j*jstride + dim->nghost*kstride;
 
   // normalize wall vector
-  mag = sqrt(Sx*Sx + Sy*Sy);
-  imag = 1.0 / mag;
-
-  Sx *= imag;
-  Sy *= imag;
-
-  // irho = 1.0 / q[midx][0];
-
-  // // find velocity on other side of wall
-  // u = q[midx][1]*irho;
-  // v = q[midx][2]*irho;
-  // p = (GAMMA - 1.0)*(q[midx][3] - 0.5*q[midx][0]*(u*u + v*v));
-  
-  // reflect normal component
-  // v_dot_wall = Sx * u + Sy * v;
-  // u = u - 2.0*Sx*v_dot_wall;
-  // v = v - 2.0*Sy*v_dot_wall;
-
-  // q[idx][0] = q[midx][0];
-  // q[idx][1] = u*q[midx][0];
-  // q[idx][2] = v*q[midx][0];
-  // q[idx][3] = p / (GAMMA - 1.0) + 0.5*q[midx][0]*(u*u + v*v);
-  
-  // q[idx][1] = q[midx][0]*(u - 2.0*Sx*Sx*u + -2.0*Sx*Sy*v);
-  // q[idx][2] = q[midx][0]*(v - 2.0*Sy*Sx*u + -2.0*Sy*Sy*v);
+  imag2 = 1.0 / (Sx*Sx + Sy*Sy);
 
   q[idx][0] = q[midx][0];
-  q[idx][1] = q[midx][1] - 2.0*Sx*Sx*q[midx][1] - 2.0*Sx*Sy*q[midx][2];
-  q[idx][2] = q[midx][2] - 2.0*Sx*Sy*q[midx][1] - 2.0*Sy*Sy*q[midx][2];
+  q[idx][1] = q[midx][1] - 2.0*Sx*Sx*imag2*q[midx][1] - 2.0*Sx*Sy*imag2*q[midx][2];
+  q[idx][2] = q[midx][2] - 2.0*Sx*Sy*imag2*q[midx][1] - 2.0*Sy*Sy*imag2*q[midx][2];
   q[idx][3] = q[midx][3];
 
-  // rhs[idx][0] =  rhs[midx][0];
-  // rhs[idx][1] = -rhs[midx][1];
-  // rhs[idx][2] = -rhs[midx][2];
-  // rhs[idx][3] =  rhs[midx][3];  
 
 }
 
