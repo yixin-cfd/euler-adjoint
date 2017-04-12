@@ -1,4 +1,5 @@
 #include "adjoint.hpp"
+#include "adj_routines.h"
 #define NO_IMPORT_ARRAY
 #define PY_ARRAY_UNIQUE_SYMBOL adjoint_ARRAY_API
 #include <numpy/ndarrayobject.h>
@@ -46,7 +47,11 @@ double Adjoint::step(){
   int j, k, idx;
   double residual = 0.0;
 
+  double* dummy;
+
   memset( rhs, 0, 4*dim->pts*sizeof(double));
+
+  // dadi_b((double*)q, (double*)rhs, dummy, (double*)psi, dt, grid->Sj, grid->Sk, grid->V, dim);
 
   this->aflux();
 

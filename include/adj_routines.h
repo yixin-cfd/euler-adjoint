@@ -9,6 +9,9 @@ extern "C" {
   void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
 		   double cfl, double *dt);
 
+  void dadi_b(double *q, double *qb, double *rhs, double *rhsb, double *dt, 
+	      double (*Sj)[2], double (*Sk)[2], double *V, Dim *dim);
+
   //
   // QDIFF routines
   //

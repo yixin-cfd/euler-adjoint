@@ -1,6 +1,17 @@
 TPN = ${TAPENADE_HOME}/bin/tapenade
 
-ALL :  tmpflux_b.c
+ALL :  tmpflux_b.c dadi_b.c
+
+dadi_b.c : dadi.c
+	${TPN} -reverse                              \
+	       -inputlanguage  c                     \
+	       -outputlanguage c                     \
+	       -I              ../include            \
+	       -head           "dadi(q rhs)/(q rhs)" \
+	       -adjfuncname    "_b"                  \
+	       -o dadi                               \
+	       dadi.c && cat *.msg
+
 
 tmpflux_b.c : tmpflux.c
 	${TPN} -reverse                      \
