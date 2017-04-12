@@ -52,8 +52,8 @@ double Adjoint::step(){
 
   this->boundary_conditions();
 
-  for(j=0; j<dim->jtot; j++){
   for(k=0; k<dim->ktot; k++){
+  for(j=0; j<dim->jtot; j++){
 
     idx = j*dim->jstride + k*dim->kstride;
 
@@ -63,21 +63,63 @@ double Adjoint::step(){
     rhs[idx][2] = rhs0[idx][2] + rhs[idx][2];
     rhs[idx][3] = rhs0[idx][3] + rhs[idx][3];
 
-    psi[idx][0] = psi[idx][0] - rhs[idx][0] * dt[idx];
-    psi[idx][1] = psi[idx][1] - rhs[idx][1] * dt[idx];
-    psi[idx][2] = psi[idx][2] - rhs[idx][2] * dt[idx];
-    psi[idx][3] = psi[idx][3] - rhs[idx][3] * dt[idx];
+  }
+  }
+
+  residual = 0.0;
+  for(k=0; k<dim->ktot; k++){
+  for(j=0; j<dim->jtot; j++){
+
+    idx = j*dim->jstride + k*dim->kstride;
 
     residual += rhs[idx][0]*rhs[idx][0];
     residual += rhs[idx][1]*rhs[idx][1];
     residual += rhs[idx][2]*rhs[idx][2];
     residual += rhs[idx][3]*rhs[idx][3];
 
+    rhs[idx][0] = - rhs[idx][0] * dt[idx];
+    rhs[idx][1] = - rhs[idx][1] * dt[idx];
+    rhs[idx][2] = - rhs[idx][2] * dt[idx];
+    rhs[idx][3] = - rhs[idx][3] * dt[idx];
+
     if(residual != residual){
       printf("nan at %d %d\n", j, k);
       throw 2341;
     }
 
+  }
+  }
+
+  // this->smooth();
+
+  // residual = 0.0;
+  // for(k=0; k<dim->ktot; k++){
+  // for(j=0; j<dim->jtot; j++){
+
+  //   idx = j*dim->jstride + k*dim->kstride;
+
+  //   residual += rhs[idx][0]*rhs[idx][0];
+  //   residual += rhs[idx][1]*rhs[idx][1];
+  //   residual += rhs[idx][2]*rhs[idx][2];
+  //   residual += rhs[idx][3]*rhs[idx][3];
+
+  //   if(residual != residual){
+  //     printf("nan at %d %d\n", j, k);
+  //     throw 2341;
+  //   }
+
+  // }
+  // }
+
+
+  for(k=0; k<dim->ktot; k++){
+  for(j=0; j<dim->jtot; j++){
+    idx = j*dim->jstride + k*dim->kstride;
+
+    psi[idx][0] = psi[idx][0] + rhs[idx][0];
+    psi[idx][1] = psi[idx][1] + rhs[idx][1];
+    psi[idx][2] = psi[idx][2] + rhs[idx][2];
+    psi[idx][3] = psi[idx][3] + rhs[idx][3];
   }
   }
 
@@ -123,10 +165,6 @@ double Adjoint::sens_xd(boost::python::object xdo){
       
       costd += xyb[idx][0]*xd[xidx][0] + xyb[idx][1]*xd[xidx][1];
 
-      // if(j == 5 && k == 1){
-      // 	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-      // }
-      
     }
   }
 

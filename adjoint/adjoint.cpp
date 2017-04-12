@@ -21,6 +21,9 @@ Adjoint::Adjoint(Euler *e){
   xyb     = new double[dim->pts][2];
 
   scratch = new double[dim->pts*4];
+  L       = new double[dim->pts][4];
+  D       = new double[dim->pts][4];
+  U       = new double[dim->pts][4];
 
   step_number = 0;
 
@@ -94,8 +97,6 @@ void Adjoint::init(boost::python::object cp_desired_o){
 
   }
   
-  printf("ok we got the pressure!\n");
-
 }
 
 
@@ -113,6 +114,9 @@ Adjoint::~Adjoint(){
   delete rhs0;
   delete dt;
   delete xyb;
+  delete D;
+  delete L;
+  delete U;
 
   printf("Adjoint Destroyed\n");
 

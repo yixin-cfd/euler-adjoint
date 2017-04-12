@@ -281,24 +281,6 @@ double Adjoint::check(){
     dBCdxy(euler->bc[i], q, rhs, xyb, dim, grid);
   }
 
-  // j = 5; k = 1; idx = j*jstride + k*kstride;
-  // printf("xy %d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-  // j = 5; k = 1; idx = j*jstride + k*kstride;
-  // printf("qb %d %d: %20.14e %20.14e \n", j, k, rhs[idx][1], rhs[idx][2]);
-
-  // double tmpres = 0.0;
-  // for(k=0; k<dim->ktot; k++){
-  //   for(j=0; j<dim->jtot; j++){
-  //     idx = j*dim->jstride + k*dim->kstride;
-  //     tmpres += xyb[idx][0]*xyb[idx][0] + xyb[idx][1]*xyb[idx][1];
-  //     // if(std::abs(xyb[idx][1]) > 1e-12){
-  //     if(j == 5 && k == 1){
-  //     	printf("%d %d: %20.14e %20.14e \n", j, k, xyb[idx][0], xyb[idx][1]);
-  //     }
-  //   }
-  // }
-  // printf("x res: %20.14e\n", tmpres);
-
   // normally here we would multiply xyb by xyd ( a delta grid change
   // ). Since we dont have that, we can make one up so that we can
   // still get a feel for the convergence of the sensitivity.

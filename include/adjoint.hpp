@@ -16,6 +16,7 @@ class Adjoint {
   BC* wall;
 
   double *scratch, *dt;
+  double (*L)[4], (*D)[4], (*U)[4];
   double *p_des;
   
   // void timestep();
@@ -24,6 +25,7 @@ class Adjoint {
   void adiss();
   double arhs_times_dt();
   void update_psi();
+  void smooth();
   void timestep();
   void cost(double (*r)[4]);
 
