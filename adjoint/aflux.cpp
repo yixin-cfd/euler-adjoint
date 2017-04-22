@@ -1,5 +1,6 @@
 #include "adjoint.hpp"
 #include "tmpfluxb.h"
+#include <omp.h>
 
 // #define DO_SIMPLE
 #define EPS 0.25
@@ -134,6 +135,7 @@ void Adjoint::aflux(){
   //
   // J-Direction
   //
+  #pragma omp parallel for private(j,idx,idx1,mini,maxi,f1,f2,A)
   for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
@@ -158,6 +160,7 @@ void Adjoint::aflux(){
   //
   // K-direction
   //
+  #pragma omp parallel for private(k,idx,idx1,mini,maxi,f1,f2,A)
   for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 
@@ -182,6 +185,7 @@ void Adjoint::aflux(){
   //
   // Dissipation: J-Direction 
   //
+  #pragma omp parallel for private(j,idx,idx1,mini,maxi,d1,d2)
   for(k=dim->nghost; k< dim->kmax+dim->nghost; k++){
   for(j=dim->nghost; j<=dim->jmax+dim->nghost; j++){
 
@@ -198,6 +202,7 @@ void Adjoint::aflux(){
   //
   // Dissipation: K-direction
   //
+  #pragma omp parallel for private(k,idx,idx1,mini,maxi,d1,d2)
   for(j=dim->nghost; j< dim->jmax+dim->nghost; j++){
   for(k=dim->nghost; k<=dim->kmax+dim->nghost; k++){
 

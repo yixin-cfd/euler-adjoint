@@ -29,6 +29,10 @@ find_package(PythonLibs REQUIRED)
 message(STATUS "python libs: ${PYTHON_LIBRARIES}")
 message(STATUS "boosts: ${Boost_LIBRARIES}")
 
+# OpenMP
+find_package(OpenMP)
+message(STATUS "openmp flags: ${OpenMP_CXX_FLAGS}")
+
 #
 # Include Directories
 #
@@ -137,7 +141,8 @@ file(GLOB adjoint_sources "${2DFLOW_SOURCE_DIR}/adjoint/*.c" "${2DFLOW_SOURCE_DI
 
 add_library(adjoint SHARED ${adjoint_sources})
 
-set_property( TARGET adjoint APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+set_property( TARGET adjoint APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall "  )
+set_property( TARGET adjoint APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS} ")
 
 set_target_properties(adjoint PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib
@@ -146,7 +151,7 @@ set_target_properties(adjoint PROPERTIES
 
 target_compile_definitions(adjoint PRIVATE ${DEBUG_DEFINITION})
 target_include_directories(adjoint PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(adjoint ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(adjoint gomp ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 
 #

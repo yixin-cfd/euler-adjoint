@@ -3,6 +3,7 @@
 #define NO_IMPORT_ARRAY
 #define PY_ARRAY_UNIQUE_SYMBOL adjoint_ARRAY_API
 #include <numpy/ndarrayobject.h>
+#include <omp.h>
 
 void Adjoint::take_steps(int nsteps){
 
@@ -47,52 +48,46 @@ double Adjoint::step(){
   int j, k, idx;
   double residual = 0.0;
 
-  double* dummy;
+  // omp_set_num_threads(1);
 
   memset( rhs, 0, 4*dim->pts*sizeof(double));
 
+  // double* dummy;
   // dadi_b((double*)q, (double*)rhs, dummy, (double*)psi, dt, grid->Sj, grid->Sk, grid->V, dim);
 
   this->aflux();
 
   this->boundary_conditions();
 
-  for(k=0; k<dim->ktot; k++){
-  for(j=0; j<dim->jtot; j++){
-
-    idx = j*dim->jstride + k*dim->kstride;
-
-    // add contribution from cost function
+  #pragma omp parallel for
+  for(idx=0; idx<dim->pts; idx++){
     rhs[idx][0] = rhs0[idx][0] + rhs[idx][0];
     rhs[idx][1] = rhs0[idx][1] + rhs[idx][1];
     rhs[idx][2] = rhs0[idx][2] + rhs[idx][2];
     rhs[idx][3] = rhs0[idx][3] + rhs[idx][3];
-
-  }
   }
 
   residual = 0.0;
-  for(k=0; k<dim->ktot; k++){
-  for(j=0; j<dim->jtot; j++){
-
-    idx = j*dim->jstride + k*dim->kstride;
+  #pragma omp parallel for reduction(+:residual)
+  for(idx=0; idx<dim->pts; idx++){
 
     residual += rhs[idx][0]*rhs[idx][0];
     residual += rhs[idx][1]*rhs[idx][1];
     residual += rhs[idx][2]*rhs[idx][2];
     residual += rhs[idx][3]*rhs[idx][3];
-
+    
     rhs[idx][0] = - rhs[idx][0] * dt[idx];
     rhs[idx][1] = - rhs[idx][1] * dt[idx];
     rhs[idx][2] = - rhs[idx][2] * dt[idx];
     rhs[idx][3] = - rhs[idx][3] * dt[idx];
 
     if(residual != residual){
+      j = idx%dim->jtot;
+      k = (idx-j)/dim->jtot%dim->ktot;
       printf("nan at %d %d\n", j, k);
       throw 2341;
     }
 
-  }
   }
 
   // this->smooth();
@@ -116,16 +111,12 @@ double Adjoint::step(){
   // }
   // }
 
-
-  for(k=0; k<dim->ktot; k++){
-  for(j=0; j<dim->jtot; j++){
-    idx = j*dim->jstride + k*dim->kstride;
-
+  #pragma omp parallel for
+  for(idx=0; idx<dim->pts; idx++){
     psi[idx][0] = psi[idx][0] + rhs[idx][0];
     psi[idx][1] = psi[idx][1] + rhs[idx][1];
     psi[idx][2] = psi[idx][2] + rhs[idx][2];
     psi[idx][3] = psi[idx][3] + rhs[idx][3];
-  }
   }
 
   return residual;
