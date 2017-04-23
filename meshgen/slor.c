@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <omp.h>
 
 // tri-diagonal solver
 void tri(double *a, double *b, double *c, double *d, int n){
@@ -143,7 +145,7 @@ void middlecoff_PQ(double *P1D, double *Q1D, double *x1D, double *y1D, int jtot,
     }
   }
 
-  
+
   for(k=1;k<ktot-1;k++){
     for(j=1;j<jtot-1;j++){
 
@@ -179,7 +181,7 @@ double residual(double *x1D, double *y1D, double *rhs1D, double *P1D, double *Q1
   double   (*Q)[jtot]    = (double (*)[jtot]   )Q1D;
   double (*rhs)[jtot][2] = (double (*)[jtot][2])rhs1D;
 
-  int j, k, dir;
+  int j, k;
   double A1, A2, A3,x_eta,y_eta,x_xi,y_xi,J;
   double y_eta_eta, x_eta_eta, y_xi_xi, x_xi_xi;
   double L2 = 0.0;
@@ -232,6 +234,7 @@ void slor(double w, double *x1D, double *y1D, double *rhs1D, double *P1D, double
   int j, jp1, jm1, k, dir;
   double A1, A2, A3,x_eta,y_eta,x_xi,y_xi,J;
   double y_eta_eta, x_eta_eta, y_xi_xi, x_xi_xi;
+
 
   for(k=1;k<ktot-1;k++){
     // loop through x and y directions

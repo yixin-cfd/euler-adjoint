@@ -285,11 +285,36 @@ double Adjoint::check(){
   // ). Since we dont have that, we can make one up so that we can
   // still get a feel for the convergence of the sensitivity.
   double liftd = 0.0;
-  double tmp1, tmp2;
+  double tmp1, tmp2, tmp3;
+  int erc = 0;
   for(i=0; i<dim->pts; i++){
     tmp1 = grid->xy[i][1];
     tmp2 = -grid->xy[i][0];
     liftd += xyb[i][0]*tmp1 + xyb[i][1]*tmp2;
+  }
+
+  if(liftd*liftd < 1e-14  or liftd != liftd){
+    tmp1  = 0.0;
+    tmp2  = 0.0;
+    tmp3  = 0.0;
+    printf("*** about to crash ----------- %e\n", liftd);
+    for(k=0; k<dim->ktot; k++){
+      for(j=0; j<dim->jtot; j++){
+	idx   = j*dim->jstride + k*dim->kstride;
+	tmp1  = grid->xy[i][1];
+	tmp2  = -grid->xy[i][0];
+	tmp3  = xyb[i][0] + xyb[i][1];
+	if(tmp1*tmp2*tmp3 != tmp1*tmp2*tmp3){
+	  printf("%3d %3d : %24.16e %24.16e %24.16e\n", j, k, tmp1, tmp2, tmp3);
+	  erc++;
+	}
+	if(erc > 10){
+	  throw 828;
+	}
+      }
+    }
+    // printf("*** about to crash: %25.14e,%25.14e,%25.14e\n", tmp3, tmp1, tmp2);
+    throw 699;
   }
 
   return liftd;

@@ -7,6 +7,7 @@ void Adjoint::timestep(){
   double u, v, p, c2, irho;
   double uu, vv;
   double xs2, ys2, xsc, ysc, eigmax;
+  double cfl = std::min(euler->inputs->cfl, 0.5);
 
   for(j=0; j<dim->jtot; j++){
   for(k=0; k<dim->ktot; k++){
@@ -37,7 +38,7 @@ void Adjoint::timestep(){
     // dt[0] = cfl * V[0] / eigmax;
 
     // actually dt over volume since later we would divide dt by volume anyway
-    dt[idx] = euler->inputs->cfl / eigmax;
+    dt[idx] = cfl / eigmax;
 
   }
   }

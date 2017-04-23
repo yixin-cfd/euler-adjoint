@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 // make AAA and BBB smaller for less stretching near the airfoil
 #define AAA 0.35
@@ -61,6 +62,7 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
   }
   
   k = 0;
+
   for(j=1;j<jtot-1;j++){
 
     x_xi      = 0.5*(x[k][j+1]-x[k][j-1]);
@@ -138,6 +140,7 @@ void ss_PQ(double *P1D, double *Q1D, double *x1D, double *y1D,
   }
 
   // ok now we have p,q,r,s for all j
+#pragma omp parallel for private(j,newP,newQ)
   for(k=1; k<ktot-1; k++){
   for(j=1; j<jtot-1; j++){
 

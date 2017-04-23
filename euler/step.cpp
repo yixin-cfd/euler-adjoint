@@ -1,15 +1,15 @@
 #include "euler.hpp"
 #include "euler_routines.h"
 
+void Euler:: go(){
+  this->take_steps(inputs->steps);
+}
+
 void Euler::take_steps(int n){
   for(int i=0; i<n; i++){
     step();
     step_number++;
   }
-}
-
-void Euler:: go(){
-  this->take_steps(inputs->steps);
 }
 
 void Euler::step(){
@@ -31,6 +31,7 @@ void Euler::step(){
   if((step_number+1)%inputs->resid == 0){
 
     if(residual != residual){
+      printf("NaN Found... throwing error\n");
       throw 234;
     }
     printf("%d : %12.8e\n", step_number+1, residual);

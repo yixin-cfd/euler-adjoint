@@ -49,6 +49,8 @@ void Euler::say_hello(){
 
 Euler::~Euler(){
 
+  // printf("___ Euler: cleaning up\n");
+  
   if(inputs) delete inputs;
   if(bc)     delete bc;
 

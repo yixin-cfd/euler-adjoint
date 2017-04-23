@@ -51,7 +51,8 @@ file(GLOB meshgen_sources "${2DFLOW_SOURCE_DIR}/meshgen/*.cpp" "${2DFLOW_SOURCE_
 
 add_library(meshgen SHARED ${meshgen_sources})
 
-set_property( TARGET meshgen APPEND_STRING PROPERTY COMPILE_FLAGS -Wall )
+set_property( TARGET meshgen APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall "  )
+set_property( TARGET meshgen APPEND_STRING PROPERTY COMPILE_FLAGS "${OpenMP_CXX_FLAGS} ")
 
 set_target_properties(meshgen PROPERTIES
   ARCHIVE_OUTPUT_DIRECTORY ${2DFLOW_BINARY_DIR}/lib

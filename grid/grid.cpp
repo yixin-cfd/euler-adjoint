@@ -107,7 +107,8 @@ Grid::Grid(boost::python::object o, int ng){
 
 
 Grid::~Grid(){
-
+  
+  // printf("___ Grid: deleting xy!!\n");
   delete[] xy;
 
 }

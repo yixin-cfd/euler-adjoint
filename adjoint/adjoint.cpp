@@ -83,7 +83,7 @@ void Adjoint::init(boost::python::object cp_desired_o){
   int wall_pts = (end - start + 1);
 
   if(wall_pts != len){
-    printf("You gave me the wrong number of pressure points!\n");
+    printf("You gave me the wrong number of pressure points: %d %d\n", wall_pts, len);
     throw 433;
   }
 
