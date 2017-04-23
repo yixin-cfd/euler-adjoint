@@ -32,8 +32,7 @@ class CG_Design:
         dynp  = 0.5 * 1.0 * M * M
         pd    = self.cp_desired*dynp + p_inf
         p     = cp1*dynp + p_inf
-        tmp   = 0.5*(p-pd)*(p-pd)
-        return np.sum(tmp)
+        return np.float64(np.sum(0.5*(p-pd)**2))
 
     def _solve_euler(self):
         airfoil = hickshenne.perturb(self.airfoil0, self.dvars)
@@ -54,10 +53,11 @@ class CG_Design:
             print "Trying to get adjoint of missing Euler object"
             raise
         adjoint  = libflow.Adjoint(self.euler)
+        # adjoint  = libflow.ADadj(self.euler)
         self.adjoint = adjoint
         print "adjoint saved?"
         adjoint.init(self.cp_desired)
-        adjoint.take_steps(1000)
+        adjoint.take_steps(10000)
 
     def _hash(self, dvars):
         return hash(str(dvars))
@@ -69,7 +69,7 @@ class CG_Design:
             self.case  = key
             self.dvars = dvars
             self._solve_euler()
-        cst = self._cost()*1e-4
+        cst = self._cost()
         print "returning cost: ", cst
         return cst
 
@@ -103,7 +103,7 @@ class CG_Design:
             tmp_xy = mg.get_mesh()
             # the delta mesh
             d_xy = tmp_xy - self.xy
-            sens[i] = self.adjoint.sens_xd(d_xy)/eps*1e-4
+            sens[i] = self.adjoint.sens_xd(d_xy)/eps
         print "returning sensitivities: ", sens.reshape(self.dvars.shape)
         return sens.reshape(self.dvars.shape)
 

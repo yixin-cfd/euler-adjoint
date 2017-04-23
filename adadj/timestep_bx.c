@@ -47,6 +47,8 @@ void ad_timestep_bx(double q[4], double qb[4], double xy1[2], double xy1b[2],
     double uub, vvb;
     double xs2, ys2, xsc, ysc, eigmax;
     double xs2b, ys2b, xscb, yscb, eigmaxb;
+    if (cfl > 0.5)
+        cfl = 0.5;
     irho = 1.0/q[0];
     u = q[1]*irho;
     v = q[2]*irho;

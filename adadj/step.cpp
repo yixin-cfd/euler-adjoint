@@ -34,7 +34,7 @@ void ADadj::take_steps(int nsteps){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
-    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj]);
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
     // lift_cost_b(q[idx], qb2[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &dummy, &Jb,
     // 		upx, upy);
   }
@@ -173,7 +173,7 @@ double ADadj::check(){
     pj  = j-start;
     idx = j*dim->jstride + k*dim->kstride;
 
-    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj]);
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
     // lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
     // 		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
     // lift_cost(q[idx], grid->xy[idx], grid->xy[idx+dim->jstride], dim, &actual_cost, upx, upy);
@@ -283,7 +283,7 @@ double ADadj::sens_xd(boost::python::object xdo){
 
     // pressure_cost(q[idx], dim, &actual_cost, p_des[pj], euler->inputs);
 
-    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj]);
+    pressure_cost_b( q[idx], qb2[idx], dim, &dummy, &Jb, p_des[pj], euler->inputs);
     // lift_cost_bx(q[idx], qb2[idx], grid->xy[idx], xyb[idx], 
     // 		 grid->xy[idx+dim->jstride], xyb[idx+dim->jstride], dim, &dummy, &Jb, upx, upy);
 

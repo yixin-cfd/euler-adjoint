@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-  void pressure_cost(double q[4], Dim *dim, double *J, double p_desired);
+  void pressure_cost(double q[4], Dim *dim, double *J, double p_desired, Inputs* inputs);
   void lift_cost(double q[4], double xy1[2], double xy2[2], Dim *dim, double *J, double ux, double uy);
   void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
 		   double cfl, double *dt);
@@ -16,7 +16,7 @@ extern "C" {
   // QDIFF routines
   //
   void pressure_cost_b(double q[4], double qb[4], Dim *dim, double *J, double *
-		       Jb, double p_desired);
+		       Jb, double p_desired, Inputs* inputs);
 
   void ad_timestep_b(double q[4], double qb[4], double xy1[2], double xy2[2], 
 		     double xy3[2], double cfl, double *dt, double *dtb);

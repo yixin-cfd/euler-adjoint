@@ -23,7 +23,7 @@ def solve_p(airfoil,inputs):
     return p
 
 def find_cost(p1, p2):
-    return np.float64(np.sum((p1-p2)**2))
+    return np.float64(np.sum(0.5*(p1-p2)**2))
 
 class Design:
     def __init__(self, obj, inputs):
@@ -35,11 +35,14 @@ class Design:
         self.base_airfoil = obj['base_airfoil']
         self.airfoils     = []
         self.pressures    = []
-
+        self.dynp         = 0.5*inputs['mach']*inputs['mach']
+        self.pinf         = 1.0/1.4
         # add our airfoil to the list and the pressure too
         airfoil1 = hickshenne.perturb(self.base_airfoil, self.design_vars)
         self.airfoils.append(airfoil1)
         pressure = solve_p(airfoil1, inputs)
+        pressure = pressure*self.dynp + self.pinf
+        self.desired = self.desired*self.dynp + self.pinf
         self.pressures.append(pressure)
         print "start cost: ", find_cost(pressure, self.desired)
 
@@ -48,12 +51,13 @@ class Design:
         pressure = self.pressures[-1]
         cost     = find_cost(pressure, self.desired)
         
-        for i in range(s.shape[0]/2, s.shape[0]):
-        # for i in range(s.shape[0]/2, s.shape[0]/2+1):
+        # for i in range(s.shape[0]/2, s.shape[0]):
+        for i in range(s.shape[0]/2, s.shape[0]/2+1):
             dvars = self.design_vars.flatten() # return flat copy of array
             dvars[i] += eps
             airfoil1 = hickshenne.perturb(self.base_airfoil, dvars.reshape(self.design_vars.shape))
             new_pressure = solve_p(airfoil1, self.inputs)
+            new_pressure = new_pressure*self.dynp + self.pinf
             new_cost     = find_cost(new_pressure, self.desired)
             s[i] = (new_cost - cost) / eps
             print "%d: (%e - %e) / %e = %e"%(i,new_cost, cost, eps, s[i])

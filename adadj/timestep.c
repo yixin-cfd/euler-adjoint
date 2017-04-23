@@ -22,6 +22,8 @@ void ad_timestep(double q[4], double xy1[2], double xy2[2],  double xy3[2],
   double u, v, p, c2, irho;
   double uu, vv;
   double xs2, ys2, xsc, ysc, eigmax;
+  if(cfl > 0.5)
+    cfl = 0.5;
 
   irho = 1.0 / q[0];
 
