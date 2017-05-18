@@ -22,7 +22,10 @@ def hh1(x, y, xmi, w, mag):
 
 def perturb(airfoil, design_vars):
     x = airfoil[:,0]
-    y = airfoil[:,1]
+    x = x - np.min(x)
+    scale = np.max(x)
+    x = x / scale
+    y = airfoil[:,1]/scale
     half = (x.shape[0]-1)/2
 
     xl = x[:half]

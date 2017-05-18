@@ -33,7 +33,7 @@ Adjoint::Adjoint(Euler *e){
   memset(rhs0,0, 4*dim->pts*sizeof(double));
   memset(psi, 0, 4*dim->pts*sizeof(double));
 
-  printf("ADadj initialized\n");
+  printf("Ajoint initialized\n");
   
 }
 

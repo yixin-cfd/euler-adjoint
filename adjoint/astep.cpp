@@ -10,6 +10,8 @@ void Adjoint::take_steps(int nsteps){
   FILE *file;
   double residual, liftd;
 
+  // omp_set_num_threads(1);
+
   file = fopen("res_adj.dat", "w");
   fclose(file);
 
@@ -47,8 +49,6 @@ double Adjoint::step(){
   // FILE *f;
   int j, k, idx;
   double residual = 0.0;
-
-  // omp_set_num_threads(1);
 
   memset( rhs, 0, 4*dim->pts*sizeof(double));
 

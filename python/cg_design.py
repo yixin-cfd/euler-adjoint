@@ -6,6 +6,8 @@ import libflow
 import grid_utils, hickshenne
 import yaml
 
+CFACTOR = 1.0e-2
+
 class CG_Design:
     def __init__(self, inputs, airfoil0, cp_desired):
         assert(airfoil0.shape[0] == cp_desired.size+1)
@@ -20,6 +22,21 @@ class CG_Design:
         self.case       = None
         self.grid       = None
         self.xy         = None
+        self.ecount     = 0
+        self.acount     = 0
+        self.one_var    = -1
+        self.AD         = False
+        with open("dvars.txt", "a") as f:
+            f.write("--------\n")
+
+    def _save(self, cp, cst):
+        filename  = "pressure%02d.txt"%(self.ecount)
+        np.savetxt(filename, cp)
+        with open("dvars.txt", "a") as f:
+            for var in np.ravel(self.dvars):
+                f.write("%25.16e "%(var))
+            f.write("%25.16e\n"%(cst))
+        self.ecount += 1
 
     def _cost(self):
         if(self.euler is None):
@@ -32,7 +49,9 @@ class CG_Design:
         dynp  = 0.5 * 1.0 * M * M
         pd    = self.cp_desired*dynp + p_inf
         p     = cp1*dynp + p_inf
-        return np.float64(np.sum(0.5*(p-pd)**2))
+        cst   = np.float64(np.sum(0.5*(p-pd)**2))*CFACTOR 
+        self._save(cp1, cst)
+        return cst
 
     def _solve_euler(self):
         airfoil = hickshenne.perturb(self.airfoil0, self.dvars)
@@ -52,7 +71,10 @@ class CG_Design:
         if(self.euler is None):
             print "Trying to get adjoint of missing Euler object"
             raise
-        adjoint  = libflow.Adjoint(self.euler)
+        if(self.AD):
+            adjoint  = libflow.ADadj(self.euler)
+        else:
+            adjoint  = libflow.Adjoint(self.euler)
         # adjoint  = libflow.ADadj(self.euler)
         self.adjoint = adjoint
         print "adjoint saved?"
@@ -90,8 +112,12 @@ class CG_Design:
         # Get sensitivity to each variable
         #
         sens  = np.zeros(self.dvars.size)
-        # for i in range(sens.shape[0]/2, sens.shape[0]):
-        for i in range(sens.shape[0]/2, sens.shape[0]/2+1):
+        if(self.one_var >= 0):
+            vrange = range(self.one_var, self.one_var+1)
+        else:
+            vrange = range(sens.shape[0]/2, sens.shape[0])
+        for i in vrange:
+        # for i in range(sens.shape[0]/2, sens.shape[0]/2+1):
             dvars = self.dvars.flatten() # flat copy of array
             dvars[i] += eps
             # the new airfoil:
@@ -103,7 +129,7 @@ class CG_Design:
             tmp_xy = mg.get_mesh()
             # the delta mesh
             d_xy = tmp_xy - self.xy
-            sens[i] = self.adjoint.sens_xd(d_xy)/eps
+            sens[i] = self.adjoint.sens_xd(d_xy)/eps*CFACTOR
         print "returning sensitivities: ", sens.reshape(self.dvars.shape)
         return sens.reshape(self.dvars.shape)
 
