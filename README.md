@@ -4,20 +4,20 @@ This is a year-long project for AMSC 663-664, Fall 2016-Spring 2017.
 
 ## Main Source Directories ##
 
-*meshgen     - 2D Elliptic Mesh Generation Library
-*grid        - basic grid utilities for a 2D CFD grid
-*euler       - Euler flow solver
-*adadj       - Auto-Differentiated Adjoint
-*adjoint     - By-Hand Adjoint
-*python_wrap - Boost-Python module to make C++ accessible to Python
-*python      - Python helper functions and classes
+* meshgen     - 2D Elliptic Mesh Generation Library
+* grid        - basic grid utilities for a 2D CFD grid
+* euler       - Euler flow solver
+* adadj       - Auto-Differentiated Adjoint
+* adjoint     - By-Hand Adjoint
+* python_wrap - Boost-Python module to make C++ accessible to Python
+* python      - Python helper functions and classes
 
 ## Additional Directories ##
 
-*sample_run_directories
-*slow_euler  - A debug version of the Euler code with some routines re-written for auto-differentiation
-*include     - include directory with all headers
-*yaml        - External C++ library to parse YAML input files
+* sample_run_directories - a recently added directory with multiple run directories and python scripts for design cases
+* slow_euler  - A debug version of the Euler code with some routines re-written for auto-differentiation
+* include     - include directory with all headers
+* yaml        - External C++ library to parse YAML input files
 
 # Building and Running #
 
