@@ -24,8 +24,9 @@ if(NOT YAML_LIB)
 endif()
 
 # Python & Boost
+find_package(PythonInterp 2.7 REQUIRED)
+find_package(PythonLibs 2.7 REQUIRED)
 find_package(Boost COMPONENTS python REQUIRED)
-find_package(PythonLibs REQUIRED)
 message(STATUS "python libs: ${PYTHON_LIBRARIES}")
 message(STATUS "boosts: ${Boost_LIBRARIES}")
 

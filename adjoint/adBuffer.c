@@ -1,1 +1,0 @@
-../adadj/adBuffer.c
