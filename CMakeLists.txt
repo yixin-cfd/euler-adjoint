@@ -13,7 +13,6 @@ mark_as_advanced(FORCE CMAKE_INSTALL_PREFIX)
 
 option(2DFLOW_DEBUG "Debugging Mode and Flags" OFF)
 
-
 #
 # Find Libraries
 #
@@ -118,7 +117,11 @@ target_link_libraries(slow_euler ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARI
 #
 # Library: ADadj
 #
-file(GLOB adadj_sources "${2DFLOW_SOURCE_DIR}/adadj/*.c" "${2DFLOW_SOURCE_DIR}/adadj/*.cpp" "${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
+file(GLOB adadj_sources "${2DFLOW_SOURCE_DIR}/adadj/*.c" 
+                        "${2DFLOW_SOURCE_DIR}/adadj/*.cpp" 
+			"${2DFLOW_SOURCE_DIR}/adadj/ADFirstAidKit/adStack.c"
+			"${2DFLOW_SOURCE_DIR}/adadj/ADFirstAidKit/adBuffer.c"
+			"${2DFLOW_SOURCE_DIR}/python_wrap/python_hepers.cpp")
 
 add_library(adadj SHARED ${adadj_sources})
 
@@ -132,7 +135,7 @@ set_target_properties(adadj PROPERTIES
 list(APPEND INCLUDE_DIRS "$ENV{TAPENADE_HOME}/include")
 
 target_compile_definitions(adadj PRIVATE ${DEBUG_DEFINITION})
-target_include_directories(adadj PUBLIC ${INCLUDE_DIRS})
+target_include_directories(adadj PUBLIC ${INCLUDE_DIRS} "${2DFLOW_SOURCE_DIR}/adadj/ADFirstAidKit")
 target_link_libraries(adadj ${YAML_LIB} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 
 #
